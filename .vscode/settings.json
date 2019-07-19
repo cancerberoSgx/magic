@@ -1,0 +1,18 @@
+{
+  // Haxe completion server configuration
+  "haxe.displayServer": {
+    "print": {
+      "completion": true,
+      "reusing": true,
+      "uncaughtError": true
+    }
+  },
+  // Options for code generation
+  "haxe.codeGeneration": {
+    "functions": {
+      "anonymous": {
+        "argumentTypeHints": false
+      }
+    }
+  },
+}

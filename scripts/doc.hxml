@@ -1,0 +1,8 @@
+-lib format
+-lib sure
+-cp src
+
+-xml types.xml
+bitmap.support.Doc
+--no-output
+

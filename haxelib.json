@@ -1,0 +1,30 @@
+{
+  "name": "magic",
+  "url": "https://github.com/cancerberoSgx/magic",
+  "license": "MIT",
+  "tags": [
+    "cross",
+    "haxe",
+    "bitmap",
+    "format",
+    "image",
+    "png",
+    "conversion",
+    "processing",
+    "jpg",
+    "jpeg",
+    "imagemagick",
+    "gif",
+    "tiff",
+    "bmp"
+  ],
+  "description": "Portable API for ImageMagick `convert` commands. Supports all targets including Node.js and browser.",
+  "version": "0.0.1",
+  "releasenote": "initial design",
+  "contributors": [
+    "cancerberosgx"
+  ],
+  "classPath": "src",
+  "dependencies": {
+  }
+}

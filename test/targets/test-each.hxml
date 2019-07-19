@@ -1,0 +1,7 @@
+-lib utest
+
+-cp src
+-cp test
+
+-debug
+-main TestMain

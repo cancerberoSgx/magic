@@ -1,0 +1,5 @@
+package magic;
+
+class File{
+  
+}
