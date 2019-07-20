@@ -1,4 +1,5 @@
 package magic;
+
 using StringTools;
 
 class ImageUtil {
@@ -14,4 +15,5 @@ class ImageUtil {
 			});
 		});
 	}
+
 }
