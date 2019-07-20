@@ -11,57 +11,73 @@ interface Dispatcher {
 class Dispatch {
 	public static function get():Promise<Dispatcher> {
 		return new Promise<Dispatcher>(resolve -> {
-			if (!Magic.config.ignoreNativeIM && Exec.hasNativeIM()) {
+				#if js
+				//
+         untyped if ( (typeof(window) == 'undefined' || typeof(window.fetch) == 'undefined') && typeof(process) != 'undefined' ) {
+           if(!Magic.config.ignoreNativeIM && Exec.hasNativeIM()){
+             resolve(nativeIMDispatcher());
+             return;
+           }
+         }
+			if (!Magic.config.ignoreMagica) {
+					MagicaDispatcher.isMagicaApiAvailable().then(magicaApiAvailable -> {
+						if (magicaApiAvailable) {
+							resolve(magicaDispatcher());
+						} else {
+							throw "Magica API not available and not dispatcher found for this scenario;";
+						}
+					});
+				// } else {
+				// 	// browser
+				// 	untyped if (typeof(window) != 'undefined' && (typeof(window.Magica) == 'undefined' || typeof(window.Magica.main) != 'function')) {
+
+        //   } else {
+				// 		throw "You need to load magica library in the browser";
+				// 	}
+				// }
+		}else {
+				throw "Native ImageMagick not found and/or magica disabled or not available";
+    }
+				#else
+        if (!Magic.config.ignoreNativeIM && Exec.hasNativeIM()) {
 				resolve(nativeIMDispatcher());
-			} else if(!Magic.config.ignoreMagica ) {
-#if js
-	untyped if (((typeof(window) == 'undefined' || typeof(window.fetch) == 'undefined') && typeof(process) != 'undefined')) {  
-				MagicaDispatcher.isMagicaApiAvailable().then(magicaApiAvailable -> {
-					if (magicaApiAvailable) {
-						resolve(magicaDispatcher());
-					} else {
-						throw "Magica API not available and not dispatcher found for this scenario;";
-					}
-				});
-  }
-        #else 
-        throw "IM not installed and magica API cannot be used int non js target";
-        #end
-			}
-      else {
-        throw "not implemented dispatch for this situation";
+			} else {
+				throw "IM not installed and magica API cannot be used int non js target";
+				// throw "Native ImageMagick not found and/or magica disabled or not available";
+
       }
+				#end
+			// } else {
+			// }
 		});
 	}
 
-private static var _nativeIMDispatcher:Dispatcher;
+	private static var _nativeIMDispatcher:Dispatcher;
 
-private static function nativeIMDispatcher():Dispatcher {
-	if (_nativeIMDispatcher == null) {
-		_nativeIMDispatcher = new NativeIMDispatcher();
+	private static function nativeIMDispatcher():Dispatcher {
+		if (_nativeIMDispatcher == null) {
+			_nativeIMDispatcher = new NativeIMDispatcher();
+		}
+		return cast(_nativeIMDispatcher, Dispatcher);
 	}
-	return cast(_nativeIMDispatcher, Dispatcher);
-}
 
-private static var _magicaDispatcher:Dispatcher;
+	private static var _magicaDispatcher:Dispatcher;
 
-private static function magicaDispatcher():Dispatcher {
-  #if js
-	if (_magicaDispatcher == null) {
-		_magicaDispatcher = new MagicaDispatcher();
+	private static function magicaDispatcher():Dispatcher {
+		#if js
+		if (_magicaDispatcher == null) {
+			_magicaDispatcher = new MagicaDispatcher();
+		}
+		return cast(_magicaDispatcher, Dispatcher);
+		#else
+		throw "MagicaDispatcher only available in js target";
+		#end
 	}
-	return cast(_magicaDispatcher, Dispatcher);
-  #else 
-        throw "MagicaDispatcher only available in js target";
-  #end
-
-}
-
-// private static function canUseMagicaApi(){
-//   #if js
-//   return true;
-//   #else 
-//   return false;
-//   #end
-// }
+	// private static function canUseMagicaApi(){
+	//   #if js
+	//   return true;
+	//   #else
+	//   return false;
+	//   #end
+	// }
 }

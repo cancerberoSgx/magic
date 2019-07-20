@@ -29,19 +29,22 @@ class Layout extends Component<Component.Props> {
 
 ${Examples.list.map(e->
 '<button class="${e.name} ${this.props.state.example.name == e.name ? 'selected' : ''}">${e.name}</button>'
-)}
+).join('\n')}
 <br />
 
-<img class="input" src="${magic.File.toDataUrl(this.props.state.inputFiles[0])}"/>
+<img class="input" src="${this.props.state.inputFiles[0].asDataUrl('image/png')}"/>
 
-<table><tr><h3>stdout</h3><td><h3>stderr</h3></td></tr>
+<table>
+<tr><td><h3>stdout</h3></td><td><h3>stderr</h3></td></tr>
 <tr>
-<textarea class="stdout">${this.props.state.stdout}</textarea><td>
-<textarea class="stderr">${this.props.state.stderr}</textarea></td></tr>
+<td><textarea class="stdout">${this.props.state.stdout}</textarea></td>
+<td><textarea class="stderr">${this.props.state.stderr}</textarea></td>
+</tr>
 </table>
 
 
-${[for(output in this.props.state.outputFiles)'<img class="output" src="${magic.File.toDataUrl(output)}" />'].join('\n')}
+${this.props.state.outputFiles.map(f->
+  '<img class="output" src="${output.asDataUrl('image/png')}" />').join('\n')}
 
 <br />
 
@@ -87,7 +90,6 @@ ${Styles.css}
 
 	function exampleSelected(name:String) {
 		var ex:Example = Examples.list.find(e->e.name==name);
-    untyped debugger;
     Magic.call({
       command: ex.command,
       files: this.props.state.inputFiles
