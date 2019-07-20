@@ -45,7 +45,7 @@ class IOUtil {
 		if (cwd != null) {
 			Sys.setCwd(cwd);
 		}
-		var process:sys.io.Process;
+		var process:sys.io.Process=null;
 		try {
 			process = new sys.io.Process(cmd, args);
 			var result = {
@@ -65,7 +65,6 @@ class IOUtil {
 				Sys.setCwd(previousCwd);
 			}
       throw e;
-		}
 		}
 		#end
 	}

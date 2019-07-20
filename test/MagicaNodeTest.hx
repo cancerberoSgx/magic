@@ -8,8 +8,9 @@ using StringTools;
 class MagicaNodeTest implements utest.ITest {
 	public function new() {}
 
-	function teardownClass():Void {
+	function teardown(async:Async):Void {
 		Magic.config.ignoreNativeIM = false;
+    async.done();
 	}
 
 	public function testDifferentDispatcher(async:Async) {

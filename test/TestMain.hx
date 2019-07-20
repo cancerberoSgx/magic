@@ -9,8 +9,10 @@ class TestMain {
 		runner.addCase(new PromiseTest());
     runner.addCase(new ExecTest());
     runner.addCase(new MagicNativeTest());
-    runner.addCase(new MagicaNodeTest());
     runner.addCase(new FileTest());
+    #if js
+    runner.addCase(new MagicaNodeTest());
+    #end
 		Report.create(runner);
 		runner.run();
 	}

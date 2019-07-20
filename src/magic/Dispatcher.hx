@@ -13,7 +13,8 @@ class Dispatch {
 		return new Promise<Dispatcher>(resolve -> {
 			if (!Magic.config.ignoreNativeIM && Exec.hasNativeIM()) {
 				resolve(nativeIMDispatcher());
-			} else if(!Magic.config.ignoreMagica) {
+			} else if(!Magic.config.ignoreMagica ) {
+#if js
 				MagicaDispatcher.isMagicaApiAvailable().then(magicaApiAvailable -> {
 					if (magicaApiAvailable) {
 						resolve(magicaDispatcher());
@@ -21,7 +22,11 @@ class Dispatch {
 						throw "Magica API not available and not dispatcher found for this scenario;";
 					}
 				});
-			}else {
+        #else 
+        throw "IM not installed and magica API cannot be used int non js target";
+        #end
+			}
+      else {
         throw "not implemented dispatch for this situation";
       }
 		});
@@ -39,9 +44,22 @@ private static function nativeIMDispatcher():Dispatcher {
 private static var _magicaDispatcher:Dispatcher;
 
 private static function magicaDispatcher():Dispatcher {
+  #if js
 	if (_magicaDispatcher == null) {
 		_magicaDispatcher = new MagicaDispatcher();
 	}
 	return cast(_magicaDispatcher, Dispatcher);
+  #else 
+        throw "MagicaDispatcher only available in js target";
+  #end
+
 }
+
+// private static function canUseMagicaApi(){
+//   #if js
+//   return true;
+//   #else 
+//   return false;
+//   #end
+// }
 }

@@ -8,6 +8,7 @@ class MagicNativeTest implements utest.ITest {
 	public function new() {}
 
 	function setup() {
+		Magic.config.ignoreNativeIM = false;
 		IOUtil.execFileSync('rm', ['-rf', 'tmp']);
 		IOUtil.execFileSync('mkdir', ['tmp']);
 	}
@@ -19,7 +20,7 @@ class MagicNativeTest implements utest.ITest {
 		}
 		Magic.call(c).then(result -> {
 			Assert.same(result.code, 0);
-			Assert.same(result.stdout.trim(), 'rose:=>ROSE PNM 70x46 70x46+0+0 8-bit sRGB 9673B 0.000u 0:00.000');
+			Assert.isTrue(result.stdout.trim().indexOf('rose:=>ROSE PNM 70x46 70x46+0+0 8-bit sRGB 9673B 0.000u')!=-1);
 			async.done();
 		});
 	}
