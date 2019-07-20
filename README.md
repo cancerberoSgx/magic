@@ -8,16 +8,13 @@
 
 - [Summary](#summary)
 - [Install](#install)
-- [How it works](#how-it-works)
+  * [Browser setup](#browser-setup)
 - [API Reference](#api-reference)
 - [Usage](#usage)
-  * [Browser setup](#browser-setup)
-  * [API usage](#api-usage)
-  * [Run tests with docker](#run-tests-with-docker)
-  * [Other](#other)
 - [Tests](#tests)
   * [Run locally](#run-locally)
   * [Run with docker](#run-with-docker)
+- [Other scripts](#other-scripts)
 - [Status / TODO / Road map / Changelog](#status--todo--road-map--changelog)
 
 <!-- tocstop -->
