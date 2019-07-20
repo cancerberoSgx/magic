@@ -9,4 +9,8 @@ class Util {
     s = s==null? '':s;
     return ~/[\?].*$/g.replace(s, '');
 	}
+  
+	public inline static function urlToBase64(s:String) {
+		return s.substring(s.indexOf(';base64,') + ';base64,'.length);
+	}
 }

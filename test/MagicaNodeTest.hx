@@ -1,5 +1,4 @@
-import utest.Async;
-import utest.Assert;
+import utest.*;
 import magic.Dispatcher.Dispatch;
 import magic.*;
 
@@ -21,6 +20,7 @@ class MagicaNodeTest implements utest.ITest {
 		async.done();
 	}
 
+	@:timeout(5500)
 	public function testDifferentIMVersions(async:Async) {
 		Magic.config.ignoreNativeIM = false;
 		Magic.call({
@@ -39,13 +39,14 @@ class MagicaNodeTest implements utest.ITest {
 		});
 	}
 
+	@:timeout(9500)
 	public function testMagicaIdentify(async:Async) {
 		Magic.config.ignoreNativeIM = true;
 		Magic.call({
 			command: ['identify', 'rose:'],
 			files: []
 		}).then(result -> {
-			trace(result);
+			// trace(result);
 			Assert.same(result.code, 0);
 			Assert.same(result.stdout.trim(), 'rose:=>ROSE PNM 70x46 70x46+0+0 8-bit sRGB 9673B 0.000u 0:00.000');
 			async.done();

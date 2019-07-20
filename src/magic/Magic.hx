@@ -31,7 +31,7 @@ class Magic {
 	}
 
 	/**
-	   	 * High level call. Files can be passed both as File objects or as strings. In later case, depending on the environment,
+	 * High level call. Files can be passed both as File objects or as strings. In later case, depending on the environment,
 	 * it will try to be read from filesystem or loaded from URLs  and their names will be inferred automatically from those paths.
 	 *
 	 * Also, the command can be a single string which will be automatically split.
@@ -43,6 +43,7 @@ class Magic {
 			});
 		});
 	}
+
   private static function execToCallOptions(o:MagicExecOptions):Promise<MagicCallOptions>{
     throw "not Implemented";
   }

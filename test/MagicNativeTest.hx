@@ -27,15 +27,7 @@ class MagicNativeTest implements utest.ITest {
 
 	public function testMagickCallNativeConvertNoInput(async:Async) {
 		var c:Magic.MagicCallOptions = {
-			command: [
-				'convert',
-				'rose:',
-				'-scale',
-				'50%',
-				'-rotate',
-				'33',
-				'tmp/tmpconvertNoInput.gif'
-			],
+			command: ['convert','rose:','-scale','50%','-rotate','33','tmp/tmpconvertNoInput.gif'],
 			files: []
 		};
 		Assert.isFalse(IOUtil.fileExists('tmp/tmpconvertNoInput.gif'));

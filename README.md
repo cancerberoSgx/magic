@@ -25,6 +25,7 @@ haxelib install magic
 
 And don't forget to use `-lib magic` in your projects.
 
+
 ## How it works
 
  * In sys targets (cpp, java, neko, etc) or in node.js it will first try to execute native image magick command using `sys.io.Process`
@@ -42,12 +43,57 @@ And don't forget to use `-lib magic` in your projects.
 
 ## Usage
 
-TODO:
+### Browser setup
 
-```haxe
+Magica is a standard commons.js library that can easily bundled with tools such as parcel, browserify, webpack. But since I don't know how to do that in a haxe project (and until I learn) in this example we will be loading the two libraries, separately. `magica` will expose a global variable from which we only need one function to execute ImageMagick commands:
+
+**Generating magica bundle***
+
+```sh
+mkdir -o tmp
+cd tmp
+npm i magica browserify
+npx browserify node_modules/magica/dist/src/index.js -o magica.js
+cp node_modules/magica/dist/src/imageMagick/compiled/magick.wasm .
+```
+
+If everything was OK we should have this two files: `tmp/magica.js` and `tmp/magick.wasm`. Those are the library files for magica. We just need to make sure to copy them into our application's files, and load `magica.js` from our html. **Make sure both are in the same folder**. 
+
+Checkout `browser-project/static` for a working browser application containing both and how are loaded in `index.html`. 
+
+Checkout `browser-project/src/main.hx` to see how we get a reference to the library entry point. Again, normally you souldn't have to access it like this, but just importing it like any other JavaScript library. This is temporary.
+
+Checkout [magica project page](https://github.com/cancerberoSgx/magica) for details.
+
+Beside this difference, the rest of the API and setup is the same for all haxe target languages. 
+
+### API usage
+
+<!-- ```haxe
 import magic.*;
+var c:Magic.MagicCallOptions = {
+  command: ['convert', 'rose:', '-scale', '50%', '-rotate', '33', 'output.gif'],
+  files: []
+};
+Magic.call(c).then(result -> {
+  if(result.code!=0){
+    trace('Error!', result.stderr);
+  }else {
+    Magic.call({
+      commands: 'identify'
+    })
+    // in thw server a new file output.gif should be generated
 
-//TODO
+  }
+  Assert.same(result.code, 0);
+    Assert.isTrue(IOUtil.fileExists('tmp/tmpconvertNoInput.gif'));
+    ImageUtil.identical(File.fromFile('tmp/tmpconvertNoInput.gif', true), File.fromFile('test/assets/expects/convertNoInput.gif', true)).then(result->{
+  Assert.isTrue(true);
+
+    async.done();
+    });
+  });
+//TODO -->
 ```
 
 ## Scripts
