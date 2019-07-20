@@ -15,6 +15,7 @@ class Dispatch {
 				resolve(nativeIMDispatcher());
 			} else if(!Magic.config.ignoreMagica ) {
 #if js
+	untyped if (((typeof(window) == 'undefined' || typeof(window.fetch) == 'undefined') && typeof(process) != 'undefined')) {  
 				MagicaDispatcher.isMagicaApiAvailable().then(magicaApiAvailable -> {
 					if (magicaApiAvailable) {
 						resolve(magicaDispatcher());
@@ -22,6 +23,7 @@ class Dispatch {
 						throw "Magica API not available and not dispatcher found for this scenario;";
 					}
 				});
+  }
         #else 
         throw "IM not installed and magica API cannot be used int non js target";
         #end

@@ -1,0 +1,6 @@
+-cp src
+-lib magic
+-main Main
+-debug
+
+-js bin/main.js
