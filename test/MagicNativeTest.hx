@@ -4,7 +4,7 @@ import magic.*;
 
 using StringTools;
 
-class MagicTest implements utest.ITest {
+class MagicNativeTest implements utest.ITest {
 	public function new() {}
 
 	function setup() {
@@ -13,7 +13,7 @@ class MagicTest implements utest.ITest {
 	}
 
 	public function testMagickCallNativeIdentify(async:Async) {
-		var c:Magic.CallOptions = {
+		var c:Magic.MagicCallOptions = {
 			command: ['identify', 'rose:'],
 			files: []
 		}
@@ -25,7 +25,7 @@ class MagicTest implements utest.ITest {
 	}
 
 	public function testMagickCallNativeConvertNoInput(async:Async) {
-		var c:Magic.CallOptions = {
+		var c:Magic.MagicCallOptions = {
 			command: [
 				'convert',
 				'rose:',

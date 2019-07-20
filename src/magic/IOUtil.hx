@@ -7,10 +7,10 @@ typedef ExecResult = {
 }
 
 class IOUtil {
-  public static function fileExists(path:String):Bool {
+	public static function fileExists(path:String):Bool {
 		#if js
 		untyped if (((typeof(window) == 'undefined' || typeof(window.fetch) == 'undefined') && typeof(process) != 'undefined')) {
-		untyped	return require('fs').existsSync(path);
+			untyped return require('fs').existsSync(path);
 		} else {
 			throw "Not available in the browser";
 		}
@@ -19,28 +19,54 @@ class IOUtil {
 		#end
 	}
 
-
-	public static function execFileSync(cmd:String, args:Array<String>):ExecResult {
+	public static function execFileSync(cmd:String, args:Array<String>, ?cwd:String):ExecResult {
+    // trace('EXECUTING', cmd, args, cwd);
 		#if js
 		untyped if (((typeof(window) == 'undefined' || typeof(window.fetch) == 'undefined') && typeof(process) != 'undefined')) {
 			try {
-				var stdout = untyped require('child_process').execSync(cmd + ' ' + args.map(a->'"${a}"').join(" ")); // TODO: escape quotes in args or use execFileSync instead        
-        // '"${args.map(a -> ~/\"/g.replace(a, '\\"')).join(" ")}"');
-        // '"${a.replace(~/\"/g, '\\"')}"').join(" "));
+				// var options = cwd == null ? null : {cwd: cwd};
+        var c = cmd + ' ' + args.map(a -> '"${a}"').join(" ");
+        // trace('LKASJDFLKSJDFLKSJDF', C)
+				var stdout = untyped require('child_process')
+					.execSync(c, cwd == null ? null : {cwd: cwd}); // TODO: escape quotes in args or use execFileSync instead
+				// '"${args.map(a -> ~/\"/g.replace(a, '\\"')).join(" ")}"');
+				// '"${a.replace(~/\"/g, '\\"')}"').join(" "));
 				return {code: 0, stdout: stdout.toString(), stderr: ''};
 			} catch (error:Dynamic) {
+    // trace('EXECUTING', cmd, args, cwd, 'RESULT', {code: error.code, stdout: '', stderr: error.stderr});
+
 				return {code: error.code, stdout: '', stderr: error.stderr}; // TODO: stderr, code verify
 			}
 		} else {
 			throw "Not available in the browser";
 		}
 		#else
-		var process = new sys.io.Process(cmd, args);
-		return {
-			code: process.exitCode(),
-			stdout: process.stdout.readAll().toString(),
-			stderr: process.stderr.readAll().toString()
-		};
+		var previousCwd = Sys.getCwd();
+		if (cwd != null) {
+			Sys.setCwd(cwd);
+		}
+		var process:sys.io.Process;
+		try {
+			process = new sys.io.Process(cmd, args);
+			var result = {
+				code: process.exitCode(),
+				stdout: process.stdout.readAll().toString(),
+				stderr: process.stderr.readAll().toString()
+			};
+			if (cwd != null) {
+				Sys.setCwd(previousCwd);
+			}
+			return result;
+		} catch (e:Any) {
+			if (process != null) {
+				process.close();
+			}
+			if (cwd != null) {
+				Sys.setCwd(previousCwd);
+			}
+      throw e;
+		}
+		}
 		#end
 	}
 

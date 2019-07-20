@@ -7,8 +7,6 @@ class Util {
 		url = hashIndex != -1 ? url.substring(0, hashIndex) : url;
     var s = url.split('/').pop();
     s = s==null? '':s;
-    s = ~/[\?].*$/g.replace(s, '');
-    return s;
-		// return (s+'').replace(, '');
+    return ~/[\?].*$/g.replace(s, '');
 	}
 }
