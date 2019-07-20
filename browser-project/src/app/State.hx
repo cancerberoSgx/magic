@@ -7,11 +7,9 @@ import examples.*;
 typedef  State= {
 	public var example:Example;
   public var inputFiles:Array<File>;
-  // public var result: MagicResults
+  public var command: Array<String>;
   public var outputFiles:Array<File>;
-  // public var examples:Array<Example>;
   public var stdout:String;
   public var stderr:String;
-
 };
 

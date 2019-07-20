@@ -33,13 +33,12 @@ class ImageUtil {
 				files: [img],
 				command: ['convert', img.name, 'imgInfo.json']
 			}).then(r -> {
-				if(r.files.length == 1){
-				var info:ImageInfo = cast Json.parse(r.files[0].content.toString());
-				resolve(info);
-        }
-        else {
-          resolve(null);
-        }
+				if (r.files.length == 1) {
+					var info:ImageInfo = cast Json.parse(r.files[0].content.toString());
+					resolve(info);
+				} else {
+					resolve(null);
+				}
 			});
 		});
 	}

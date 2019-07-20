@@ -12,14 +12,11 @@ class MagicaDispatcher implements Dispatcher {
 			&& typeof(window.Magica) != 'undefined'
 			&& typeof(window.Magica.main) == 'function') {
 			untyped return Promise.resolve(window.Magica);
-			// resole(true);
 		} else if (typeof(window) == 'undefined' && typeof(process) != 'undefined') {
 			// TODO: platform paths: do we really need to support backslashes for windows?
 			return Promise.resolve(untyped require(magicaFolder() + '/node_modules/magica'));
-			// untyped if (typeof(window) != 'undefined' && (typeof(window.Magica) != 'undefined' || typeof(window.Magica.main) != 'function')) {
 		} else {
 			throw "Library magica is not available";
-			// resolve(false);
 		}
 	}
 
@@ -34,7 +31,7 @@ class MagicaDispatcher implements Dispatcher {
 					})
 				}).then(magicaResults -> {
 					var r:MagicResults = {
-						files: magicaResults.outputFiles,
+						files: magicaResults.outputFiles.map(f -> new File(f.name, haxe.io.Bytes.ofData(f.content))),
 						stdout: magicaResults.stdout.join('\n'),
 						stderr: magicaResults.stderr.join('\n'),
 						error: magicaResults.error,
@@ -57,7 +54,6 @@ class MagicaDispatcher implements Dispatcher {
 					resolve(_isMagicaApiAvailable);
 					return;
 				}
-				// ensureMagicaInstall().then(installed->{
 				if (ensureMagicaInstall()) {
 					if (checkMagicaInstall()) {
 						_isMagicaApiAvailable = true;
@@ -66,15 +62,10 @@ class MagicaDispatcher implements Dispatcher {
 						trace('There where problems installing npm package magica. 22222');
 						resolve(false);
 					}
-					// checkMagicaInstall().then(magicaApiAvailable->{
-					//   _isMagicaApiAvailable=magicaApiAvailable;
-					//   resolve(magicaApiAvailable);
-					// });
 				} else {
 					trace('There where problems installing npm package magica.');
 					resolve(false);
 				}
-				// });
 			} else {
 				// The browser
 				untyped if (typeof(window) != 'undefined'
@@ -82,7 +73,6 @@ class MagicaDispatcher implements Dispatcher {
 					&& typeof(window.Magica.main) == 'function') {
 					_isMagicaApiAvailable = true;
 					resolve(true);
-					// throw "You need to load magica library in the browser";
 				} else {
 					resolve(false);
 				}
@@ -106,22 +96,15 @@ class MagicaDispatcher implements Dispatcher {
 			trace('error while requiring magica: ', ex);
 			return false;
 		}
-		// TODO: try{return typeof require('magica').main!=null}catch(e){return false}
-		// return Promise.resolve(true);
 	}
 
-	// require('/Users/sebastiangurin/git/geometrizejs/geometrizejs-extra/node_modules/mujer')
 	static function magicaFolder():String {
 		untyped var ss:String = process.env.HOME + '';
 		ss = ~/\\/g.replace(ss, '/');
 		return ss + '/.magic/magic-npm-project';
-
-		// return untyped .replace(/\\/g, '/')
 	}
 
-	//  = '';//$HOME/.magic/node-modules/
 	static function ensureMagicaInstall() {
-		// checkMagicaInstall().then(installed->{
 		if (!checkMagicaInstall()) {
 			// TODO: platform paths: do we really need to support backslashes for windows?
 			if (!IOUtil.fileExists(magicaFolder())) {
@@ -129,17 +112,12 @@ class MagicaDispatcher implements Dispatcher {
 			}
 			// TODO: platform paths: do we really need to support backslashes for windows?
 			if (!IOUtil.fileExists(magicaFolder() + '/package.json')) {
-				// trace('npm', ['init', '-y'], magicaFolder());
 				var r = IOUtil.execFileSync('npm', ['init', '-y'], magicaFolder());
-				//  npm install --prefix /my/project/root
 				if (r.code != 0) {
 					// trace('There where problems installing npm package magica. - when executing npm init -y ', ['init', '-y'], magicaFolder());
 					throw 'There where problems installing npm package magica. - when executing npm init -y ' + ['init', '-y', magicaFolder()].join(' ');
-					// return false;
 				}
 			}
-			//  }
-			// trace('npm', ['install', '--save', 'magica'], magicaFolder());
 			var r = IOUtil.execFileSync('npm', ['install', '--save', 'magica'], magicaFolder());
 			//  npm install --prefix /my/project/root
 			if (r.code != 0) {
@@ -148,22 +126,9 @@ class MagicaDispatcher implements Dispatcher {
 					r);
 				throw 'There where problems installing npm package magica. - when executing npm install ' + ['install', '--save', 'magica', magicaFolder()]
 					.join(' ');
-
-				// return false;
 			}
 			return checkMagicaInstall();
-			//  if $HOME/.magic/node-modules/magica doesnt exists: {
-			// TODO: mkdir -p $HOME/.magic/          //TODO: cd  $HOME/.magic/          //TODO: npm inin -y
-			// TODO: npm i magica
-			// magicaNodeModules = $HOME/.magic/node-modules/
-
-			// }
-			// else { if it exists but it it didn't work
 		}
 		return true;
-		// }
-		// })
-		// TODO: try{return typeof require('magica').main!=null}catch(e){return false}
-		// return Promise.resolve(true);
 	}
 }

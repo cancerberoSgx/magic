@@ -13,6 +13,10 @@ img {
 }
 textarea {
   height: 122px;
+  width: 100%;
+}
+table {
+  width: 100%;
 }
 .selected {
   border: 2px solid pink;

@@ -3,7 +3,7 @@ package app;
 import js.html.Element;
 
 typedef Props = {
-	var state(default, null):State;
+	var state(default, default):State;
 	@:optional var children(default, null):Array<Component<Props>>;
 };
 

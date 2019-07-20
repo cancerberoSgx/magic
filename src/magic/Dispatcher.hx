@@ -11,44 +11,31 @@ interface Dispatcher {
 class Dispatch {
 	public static function get():Promise<Dispatcher> {
 		return new Promise<Dispatcher>(resolve -> {
-				#if js
-				//
-         untyped if ( (typeof(window) == 'undefined' || typeof(window.fetch) == 'undefined') && typeof(process) != 'undefined' ) {
-           if(!Magic.config.ignoreNativeIM && Exec.hasNativeIM()){
-             resolve(nativeIMDispatcher());
-             return;
-           }
-         }
+			#if js
+			untyped if ((typeof(window) == 'undefined' || typeof(window.fetch) == 'undefined') && typeof(process) != 'undefined') {
+				if (!Magic.config.ignoreNativeIM && Exec.hasNativeIM()) {
+					resolve(nativeIMDispatcher());
+					return;
+				}
+			}
 			if (!Magic.config.ignoreMagica) {
-					MagicaDispatcher.isMagicaApiAvailable().then(magicaApiAvailable -> {
-						if (magicaApiAvailable) {
-							resolve(magicaDispatcher());
-						} else {
-							throw "Magica API not available and not dispatcher found for this scenario;";
-						}
-					});
-				// } else {
-				// 	// browser
-				// 	untyped if (typeof(window) != 'undefined' && (typeof(window.Magica) == 'undefined' || typeof(window.Magica.main) != 'function')) {
-
-        //   } else {
-				// 		throw "You need to load magica library in the browser";
-				// 	}
-				// }
-		}else {
+				MagicaDispatcher.isMagicaApiAvailable().then(magicaApiAvailable -> {
+					if (magicaApiAvailable) {
+						resolve(magicaDispatcher());
+					} else {
+						throw "Magica API not available and not dispatcher found for this scenario;";
+					}
+				});
+			} else {
 				throw "Native ImageMagick not found and/or magica disabled or not available";
-    }
-				#else
-        if (!Magic.config.ignoreNativeIM && Exec.hasNativeIM()) {
+			}
+			#else
+			if (!Magic.config.ignoreNativeIM && Exec.hasNativeIM()) {
 				resolve(nativeIMDispatcher());
 			} else {
 				throw "IM not installed and magica API cannot be used int non js target";
-				// throw "Native ImageMagick not found and/or magica disabled or not available";
-
-      }
-				#end
-			// } else {
-			// }
+			}
+			#end
 		});
 	}
 
@@ -73,11 +60,4 @@ class Dispatch {
 		throw "MagicaDispatcher only available in js target";
 		#end
 	}
-	// private static function canUseMagicaApi(){
-	//   #if js
-	//   return true;
-	//   #else
-	//   return false;
-	//   #end
-	// }
 }

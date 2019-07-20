@@ -11,15 +11,15 @@ class Exec {
 	}
 
 	public static function commandThrows(cmd:String, args:Array<String>, ?stdoutIncludes:String):Bool {
-    var p = IOUtil.execFileSync(cmd, args);
+		var p = IOUtil.execFileSync(cmd, args);
 		if (p.code != 0) {
 			return true;
 		} else {
-			if (stdoutIncludes != null) { 
+			if (stdoutIncludes != null) {
 				return p.stdout.indexOf(stdoutIncludes) == -1;
-			}else {
-			return false;
-      }
+			} else {
+				return false;
+			}
 		}
 	}
 }

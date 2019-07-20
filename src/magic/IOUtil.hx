@@ -20,21 +20,14 @@ class IOUtil {
 	}
 
 	public static function execFileSync(cmd:String, args:Array<String>, ?cwd:String):ExecResult {
-    // trace('EXECUTING', cmd, args, cwd);
 		#if js
 		untyped if (((typeof(window) == 'undefined' || typeof(window.fetch) == 'undefined') && typeof(process) != 'undefined')) {
 			try {
-				// var options = cwd == null ? null : {cwd: cwd};
         var c = cmd + ' ' + args.map(a -> '"${a}"').join(" ");
-        // trace('LKASJDFLKSJDFLKSJDF', C)
 				var stdout = untyped require('child_process')
 					.execSync(c, cwd == null ? null : {cwd: cwd}); // TODO: escape quotes in args or use execFileSync instead
-				// '"${args.map(a -> ~/\"/g.replace(a, '\\"')).join(" ")}"');
-				// '"${a.replace(~/\"/g, '\\"')}"').join(" "));
 				return {code: 0, stdout: stdout.toString(), stderr: ''};
 			} catch (error:Dynamic) {
-    // trace('EXECUTING', cmd, args, cwd, 'RESULT', {code: error.code, stdout: '', stderr: error.stderr});
-
 				return {code: error.code, stdout: '', stderr: error.stderr}; // TODO: stderr, code verify
 			}
 		} else {

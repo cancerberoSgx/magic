@@ -31,10 +31,13 @@ HxOverrides.substr = function(s,pos,len) {
 var Main = function() { };
 Main.__name__ = true;
 Main.main = function() {
-	magic_IOUtil.fetchResource("bluebells.png",function(error,data) {
-		var bytes = haxe_io_Bytes.ofData(data);
-		var inputFile = new magic_File("input.png",bytes);
-		var initialState = { example : examples_Examples.list[0], inputFiles : [inputFile], outputFiles : [], stdout : "", stderr : ""};
+	magic_File.fromUrl("bluebells.png").then(function(file) {
+		if(file == null) {
+			throw new js__$Boot_HaxeError("An error occurs loading default initial image");
+		}
+		var ex = examples_Examples.list[0];
+		var initialState = { example : ex, inputFiles : [file], outputFiles : [], stdout : "", stderr : "", command : []};
+		initialState.command = ex.command(initialState);
 		app_Store.init(initialState);
 		app_Store.getInstance().addStateChangeListener({ onStateChange : function(old,newState) {
 			app_Component.renderDom(window.document.querySelector("#main"),new app_Layout({ state : newState}));
@@ -124,11 +127,15 @@ app_Layout.__super__ = app_Component;
 app_Layout.prototype = $extend(app_Component.prototype,{
 	render: function() {
 		var _gthis = this;
-		return "\n<h1>Magic playground</h1>\n<p>Welcome to Magic library playground! An image should be shown below (loaded as Magic bitmap). Play with the controls to see it in action. Click on output images to download them.</p>\n<br />\n<label>Load File <input type=\"file\"  class=\"loadFile\"></label> <br />\n<button class=\"getSource\">See Example Sources</button>\n\n" + examples_Examples.list.map(function(e) {
-			return "<button class=\"" + e.name + " " + (_gthis.props.state.example.name == e.name ? "selected" : "") + "\">" + e.name + "</button>";
-		}).join("\n") + "\n<br />\n\n<img class=\"input\" src=\"" + this.props.state.inputFiles[0].asDataUrl("image/png") + "\"/>\n\n<table>\n<tr><td><h3>stdout</h3></td><td><h3>stderr</h3></td></tr>\n<tr>\n<td><textarea class=\"stdout\">" + this.props.state.stdout + "</textarea></td>\n<td><textarea class=\"stderr\">" + this.props.state.stderr + "</textarea></td>\n</tr>\n</table>\n\n\n" + this.props.state.outputFiles.map(function(f) {
-			return "<img class=\"output\" src=\"${output.asDataUrl('image/png')}\" />";
-		}).join("\n") + "\n\n<br />\n\n<style>\n" + app_Styles.css + "\n</style>\n  ";
+		return "\n<h1>Magic playground</h1>\n<p>Welcome to <a href=\"https://github.com/cancerberoSgx/magic\">magic</a> playground, a <a href=\"https://haxe.org\" rel=\"nofollow\">Haxe</a> API for running <a href=\"https://github.com/ImageMagick/ImageMagick\">ImageMagick</a> commands like <code>convert</code>, <code>identify</code>, supporting all haxe targets, <strong>even the browser</strong> (!) thanks to <a href=\"https://cancerberosgx.github.io/magica/\" rel=\"nofollow\">magica</a>, an <a href=\"https://emscripten.org/\" rel=\"nofollow\">emscripten</a> port of <a href=\"https://github.com/ImageMagick/ImageMagick\">ImageMagick</a> that allows to programmatically call its <code>convert</code>, <code>identify</code>, etc. commands in a programmatic way.</p>\n\n<p>Load images from your system or urls. <strong>A lot of formats are supported!</strong> like png, jpg, gif, tiff, bmp, tga, psd, ps, pdf, svg, heic, dpx, etc. Click on output images to download them. Edit the commands and run them again. Check for logs and errors. Checkout the example list to search for something similar you want to accomplish.</p>\n<br />\n\n<label>Load File <input type=\"file\"  class=\"loadFile\"></label> <br />\n\n\n<h3>Examples</h3>\n<select class=\"examples\">\n" + examples_Examples.list.map(function(e) {
+			return "<option " + (_gthis.props.state.example.name == e.name ? "selected" : "") + " value=\"" + e.name + "\">" + e.name + "</option>";
+		}).join(" ") + "\n</select>\n\n<br />\n\n\n<h3>Sample Images</h3>\n<select class=\"sample-images\">\n" + examples_SampleImages.list.map(function(e1) {
+			return "<option value=\"" + e1 + "\">" + e1 + "</option>";
+		}).join(" ") + "\n</select>\n<br />\n\n\n<textarea class=\"command\">" + JSON.stringify(this.props.state.command) + "</textarea>\n<br />\n\n<button class=\"execute\">Execute</button>\n<br />\n<h3>Input files</h3>\n" + this.props.state.inputFiles.map(function(f) {
+			return "<img data-name=\"" + f.name + "\" class=\"input\" src=\"" + f.asDataUrl("image/png") + "\"/> ";
+		}).join(" ") + "\n\n\n\n<h3>Output files</h3>\n\n" + this.props.state.outputFiles.map(function(f1) {
+			return "<img data-name=\"" + f1.name + "\"  class=\"output\" src=\"" + f1.asDataUrl("image/png") + "\" />";
+		}).join(" ") + "\n<br/>\n\n<table>\n<tr><td><h3>stdout</h3></td><td><h3>stderr</h3></td></tr>\n<tr>\n<td><textarea class=\"stdout\">" + this.props.state.stdout + "</textarea></td>\n<td><textarea class=\"stderr\">" + this.props.state.stderr + "</textarea></td>\n</tr>\n</table>\n\n<style>\n" + app_Styles.css + "\n</style>\n\n<a href=\"https://github.com/cancerberoSgx/magic\" style=\"opacity:0.6;position:fixed;padding:5px 45px;width:auto;bottom:20px;left:-60px; -webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);transform:rotate(45deg);box-shadow:0 0 0 3px #f6c304, 0 0 20px -3px rgba(0, 0, 0, 0.5);text-shadow:0 0 0 #555555, 0 0 5px rgba(0, 0, 0, 0.3);background-color:#f6c304;color:#555555;font-size:13px;font-family:sans-serif;text-decoration:none;font-weight:bold;border:2px dotted #555555;-webkit-backface-visibility:hidden;letter-spacing:.5px;\">Fork me on GitHub</a>\n\n  ";
 	}
 	,applicationDownload: function(url,filename) {
 		window.fetch(url).then(function(response) {
@@ -143,39 +150,62 @@ app_Layout.prototype = $extend(app_Component.prototype,{
 	}
 	,afterRender: function() {
 		var _gthis = this;
-		this.queryOne(".identify").addEventListener("click",function(e) {
-			_gthis.exampleSelected("identify");
+		this.queryOne(".execute").addEventListener("click",function(e) {
+			_gthis.exampleSelected(_gthis.props.state.example.name);
 			return;
 		});
-		this.queryOne(".getSource").addEventListener("click",function(e1) {
-			return _gthis.queryOne(".exampleCode").scrollIntoViewIfNeeded();
+		this.queryOne(".sample-images").addEventListener("change",function(e1) {
+			magic_File.fromUrl(e1.currentTarget.value).then(function(file) {
+				_gthis.setInputFiles([file]);
+				return;
+			});
+			return;
 		});
-		this.queryOne(".loadFile").addEventListener("change",function(e2) {
-			return magic_File.fromHtmlFileInputElement(e2.currentTarget).then(function(files) {
-				app_Store.getInstance().setState({ example : _gthis.props.state.example, inputFiles : files, stdout : _gthis.props.state.stdout, stderr : _gthis.props.state.stderr, outputFiles : _gthis.props.state.outputFiles});
+		this.queryOne(".examples").addEventListener("change",function(e2) {
+			var name = e2.currentTarget.value;
+			var ex = magic_ArrayExtensions.find(examples_Examples.list,function(e3) {
+				return e3.name == name;
+			});
+			_gthis.executeExample(ex);
+			return;
+		});
+		this.queryOne(".loadFile").addEventListener("change",function(e4) {
+			return magic_File.fromHtmlFileInputElement(e4.currentTarget).then(function(files) {
+				_gthis.setInputFiles(files);
 				return;
 			});
 		});
-		var i = 0;
 		var _g = 0;
-		var _g1 = this.query(".output");
+		var _g1 = this.query(".output, .input");
 		while(_g < _g1.length) {
 			var output = _g1[_g];
 			++_g;
-			output.addEventListener("click",function(e3) {
-				i += 1;
-				_gthis.applicationDownload(e3.currentTarget.src,"output-" + (i - 1) + ".png");
+			output.addEventListener("click",function(e5) {
+				var e6 = e5.currentTarget.src;
+				var tmp = e5.currentTarget.getAttribute("data-name");
+				_gthis.applicationDownload(e6,tmp);
 				return;
 			});
 		}
 	}
+	,setInputFiles: function(files) {
+		var state = { example : this.props.state.example, inputFiles : files, stdout : this.props.state.stdout, stderr : this.props.state.stderr, outputFiles : this.props.state.outputFiles, command : []};
+		this.props.state = state;
+		this.props.state.command = this.props.state.example.command(state);
+		app_Store.getInstance().setState(this.props.state);
+		this.executeExample(this.props.state.example);
+	}
 	,exampleSelected: function(name) {
-		var _gthis = this;
 		var ex = magic_ArrayExtensions.find(examples_Examples.list,function(e) {
 			return e.name == name;
 		});
-		magic_Magic.call({ command : ex.command, files : this.props.state.inputFiles}).then(function(result) {
-			app_Store.getInstance().setState({ example : ex, outputFiles : result.files, stdout : result.stdout, stderr : result.stderr, inputFiles : _gthis.props.state.inputFiles});
+		this.executeExample(ex);
+	}
+	,executeExample: function(ex) {
+		var _gthis = this;
+		var command = ex.command(this.props.state);
+		magic_Magic.call({ command : command, files : this.props.state.inputFiles}).then(function(result) {
+			app_Store.getInstance().setState({ example : ex, outputFiles : result.files, stdout : result.stdout, stderr : result.stderr, command : command, inputFiles : _gthis.props.state.inputFiles});
 			return;
 		});
 	}
@@ -207,7 +237,7 @@ app_Store.prototype = {
 		var tmp_1_example = this.state.example;
 		var tmp_2 = this.state;
 		var tmp_3 = partialState;
-		this.state = { stdout : tmp_3.stdout, stderr : tmp_3.stderr, outputFiles : tmp_3.outputFiles, inputFiles : tmp_3.inputFiles, example : tmp_3.example};
+		this.state = { stdout : tmp_3.stdout, stderr : tmp_3.stderr, outputFiles : tmp_3.outputFiles, inputFiles : tmp_3.inputFiles, example : tmp_3.example, command : tmp_3.command};
 		var _g = 0;
 		var _g1 = this.stateChangeListeners;
 		while(_g < _g1.length) {
@@ -225,6 +255,8 @@ var app_Styles = function() { };
 app_Styles.__name__ = true;
 var examples_Examples = function() { };
 examples_Examples.__name__ = true;
+var examples_SampleImages = function() { };
+examples_SampleImages.__name__ = true;
 var haxe_Log = function() { };
 haxe_Log.__name__ = true;
 haxe_Log.formatOutput = function(v,infos) {
@@ -1003,7 +1035,7 @@ magic_File.fromUrl = function(url) {
 	});
 };
 magic_File.toDataUrl = function(file,mime) {
-	return "data:" + mime + ";" + file.name + "base64," + magic_File.toBase64(file);
+	return "data:" + mime + ";" + file.name + ";base64," + magic_File.toBase64(file);
 };
 magic_File.toBase64 = function(file) {
 	return haxe_crypto_Base64.encode(file.content);
@@ -1027,7 +1059,7 @@ magic_File.fromHtmlFileInputElement = function(el) {
 		return new Promise(function(resolve,reject) {
 			var reader = new FileReader();
 			reader.addEventListener("loadend",function(e) {
-				resolve({ name : Std.string(file1) + "", content : new Uint8Array(reader.result)});
+				resolve({ name : file1.name, content : new Uint8Array(reader.result)});
 				return;
 			});
 			reader.readAsArrayBuffer(file1);
@@ -1240,7 +1272,7 @@ magic_MagicaDispatcher.ensureMagicaInstall = function() {
 		}
 		var r1 = magic_IOUtil.execFileSync("npm",["install","--save","magica"],magic_MagicaDispatcher.magicaFolder());
 		if(r1.code != 0) {
-			haxe_Log.trace("There where problems installing npm package magica. - when executing npm install " + ["install","--save","magica",magic_MagicaDispatcher.magicaFolder()].join(" "),{ fileName : "magic/MagicaDispatcher.hx", lineNumber : 122, className : "magic.MagicaDispatcher", methodName : "ensureMagicaInstall", customParams : [r1]});
+			haxe_Log.trace("There where problems installing npm package magica. - when executing npm install " + ["install","--save","magica",magic_MagicaDispatcher.magicaFolder()].join(" "),{ fileName : "magic/MagicaDispatcher.hx", lineNumber : 124, className : "magic.MagicaDispatcher", methodName : "ensureMagicaInstall", customParams : [r1]});
 			throw new js__$Boot_HaxeError("There where problems installing npm package magica. - when executing npm install " + ["install","--save","magica",magic_MagicaDispatcher.magicaFolder()].join(" "));
 		}
 		return magic_MagicaDispatcher.checkMagicaInstall();
@@ -1256,7 +1288,9 @@ magic_MagicaDispatcher.prototype = {
 					return { name : f.name, content : f.content.b.bufferValue.bytes};
 				});
 				magica.main({ command : o1, inputFiles : tmp}).then(function(magicaResults) {
-					var r = { files : magicaResults.outputFiles, stdout : magicaResults.stdout.join("\n"), stderr : magicaResults.stderr.join("\n"), error : magicaResults.error, code : magicaResults.error == null ? 0 : 1};
+					var r = { files : magicaResults.outputFiles.map(function(f1) {
+						return new magic_File(f1.name,haxe_io_Bytes.ofData(f1.content));
+					}), stdout : magicaResults.stdout.join("\n"), stderr : magicaResults.stderr.join("\n"), error : magicaResults.error, code : magicaResults.error == null ? 0 : 1};
 					resolve(r);
 					return;
 				});
@@ -1357,8 +1391,19 @@ Object.defineProperty(js__$Boot_HaxeError.prototype,"message",{ get : function()
 	return String(this.val);
 }});
 js_Boot.__toStr = ({ }).toString;
-app_Styles.css = "  \nbody {\n  background: linear-gradient(45deg, rgb(209, 192, 192) 25%, transparent 26%, transparent 75%, rgb(209, 192, 192) 76%),\n    linear-gradient(-45deg, rgb(209, 192, 192) 25%, transparent 26%, transparent 75%, rgb(209, 192, 192) 76%);\n  background-color: rgb(161, 179, 206);\n  background-size: 100px 100px;\n}\nimg {\n  cursor: pointer;\n}\ntextarea {\n  height: 122px;\n}\n.selected {\n  border: 2px solid pink;\n}\n  ";
-examples_Examples.list = [{ name : "identify", command : ["identify","rose:"]}];
+app_Styles.css = "  \nbody {\n  background: linear-gradient(45deg, rgb(209, 192, 192) 25%, transparent 26%, transparent 75%, rgb(209, 192, 192) 76%),\n    linear-gradient(-45deg, rgb(209, 192, 192) 25%, transparent 26%, transparent 75%, rgb(209, 192, 192) 76%);\n  background-color: rgb(161, 179, 206);\n  background-size: 100px 100px;\n}\nimg {\n  cursor: pointer;\n}\ntextarea {\n  height: 122px;\n  width: 100%;\n}\ntable {\n  width: 100%;\n}\n.selected {\n  border: 2px solid pink;\n}\n  ";
+examples_Examples.list = [{ name : "scale-rotate", command : function(state) {
+	return ["convert",state.inputFiles[0].name,"-scale","70%","-rotate","33","scaled-rotated.jpg"];
+}, description : "simple command that scale and rotates the image"},{ name : "identify", command : function(state1) {
+	return ["identify"].concat(state1.inputFiles.map(function(f) {
+		return f.name;
+	}));
+}, description : "just calls identify to get information of the image"},{ name : "animation-one-command", description : "Generates several intermediate output files incrementing rotation and with all of them a final .gif. Uses +clone and parenthesis", command : function(state2) {
+	return ["convert",state2.inputFiles[0].name].concat("-scale 50% -virtual-pixel mirror ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) output.gif".split(" "));
+}},{ name : "gif-wave-swirl-gif", command : function(state3) {
+	return "convert -swirl 123 -wave 14x95 -scale 74% -rotate 15 -background transparent".split(" ").concat([state3.inputFiles[0].name,"foo22.gif"]);
+}, description : "perform a series of complex effects over an animated gif which results in another animated transformed gif."}];
+examples_SampleImages.list = ["bluebells.png","bridge.psd","challenge.gif","photo.tiff","whale4.jpg","wand.ico"];
 haxe_crypto_Base64.CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 haxe_crypto_Base64.BYTES = haxe_io_Bytes.ofString(haxe_crypto_Base64.CHARS);
 magic_Magic.config = { ignoreNativeIM : false, magicaOnlyBrowser : false, ignoreMagica : false};

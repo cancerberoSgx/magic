@@ -44,33 +44,22 @@ class Magic {
 		});
 	}
 
-  private static function execToCallOptions(o:MagicExecOptions):Promise<MagicCallOptions>{
-    throw "not Implemented";
-  }
+	private static function execToCallOptions(o:MagicExecOptions):Promise<MagicCallOptions> {
+		throw "not Implemented";
+	}
 
-
-  // static var config:Map<String,String> = new Map();
-  // TODO: haxe issue I needed to declarea function if not in js i get Error: Cannot read property 'ignoreNativeIM' of undefined
-// public static var config:Config = defaultConfig;
-public static var config = {
-    ignoreNativeIM: false,
-    magicaOnlyBrowser:false,
-    ignoreMagica:false
-  };
-  // static var defaultConfig = {
-  //   ignoreNativeIM: false,
-  //   magicaOnlyBrowser:false,
-  //   ignoreMagica:false
-  // };
-  // public static function setConfig(name:String,value:Any){
-  //   this.config[name] = value;
-  // } 
-  // public static function getConfig(name:String):Any{
-  //   return this.config[name];
-  // }
+	// static var config:Map<String,String> = new Map();
+	// TODO: haxe issue I needed to declared function if not in js i get Error: Cannot read property 'ignoreNativeIM' of undefined
+	// public static var config:Config = defaultConfig;
+	public static var config = {
+		ignoreNativeIM: false,
+		magicaOnlyBrowser: false,
+		ignoreMagica: false
+	};
 }
+
 typedef Config = {
-   var ignoreNativeIM: Bool;
-   var magicaOnlyBrowser:Bool;
-   var ignoreMagica:Bool;
+	var ignoreNativeIM:Bool;
+	var magicaOnlyBrowser:Bool;
+	var ignoreMagica:Bool;
 }

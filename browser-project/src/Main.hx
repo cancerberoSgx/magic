@@ -7,21 +7,20 @@ import magic.*;
 
 class Main {
 	public static function main() {
-		IOUtil.fetchResource('bluebells.png', (error:Dynamic, data:haxe.io.BytesData) -> {
-			var bytes = haxe.io.Bytes.ofData(data);
-      var inputFile = new File('input.png', bytes);
-			// var input = new haxe.io.BytesInput(bytes);
-			// var bitmap = new PNGBitmap();
-			// bitmap.load(input);
+		File.fromUrl('bluebells.png').then(file -> {
+			if (file == null) {
+				throw "An error occurs loading default initial image";
+			}
+			var ex = Examples.list[0];
 			var initialState:State = {
-				example: Examples.list[0],
-        inputFiles: [inputFile],
-        outputFiles: [],
-        stdout: '',
-        stderr: ''
-        // examples: Examples.list
-        // command: ['convert' , 'rose:',  '-scale',  '120%']
+				example: ex,
+				inputFiles: [file],
+				outputFiles: [],
+				stdout: '',
+				stderr: '',
+				command: []
 			};
+			initialState.command = ex.command(initialState);
 			Store.init(initialState);
 			Store.getInstance().addStateChangeListener({
 				onStateChange: (old:State, newState:State) -> {

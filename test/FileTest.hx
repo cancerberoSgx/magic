@@ -22,7 +22,6 @@ class FileTest implements utest.ITest {
 		});
 	}
 
-	// @:timeout(5500)
 	public function testImageUtilidentical3(async:Async) {
 		ImageUtil.identical(File.fromFile('test/assets/expects/convertNoInput.gif', true), File.fromFile('test/assets/expects/convertNoInput.gif', true))
 			.then(result -> {
@@ -31,6 +30,13 @@ class FileTest implements utest.ITest {
 		});
 	}
 
+	// public function testFileNameFromUrl() {
+	// 	ImageUtil.identical(File.fromFile('test/assets/expects/convertNoInput.gif', true), File.fromFile('test/assets/expects/convertNoInput.gif', true))
+	// 		.then(result -> {
+	// 		Assert.isTrue(result);
+	// 		async.done();
+	// 	});
+	// }
 	@:timeout(5500)
 	public function testFileFromUrl(async:Async) {
 		var url = 'https://cancerberosgx.github.io/demos/magica/images/parrots_orig.png';

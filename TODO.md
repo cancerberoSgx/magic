@@ -1,4 +1,5 @@
 ## TODO
+- [ ] commands as string using clitoarray
 - [ ] use magica CLI on non js targets if no local IM found.
 - [ ] include scripts to get IM and libraries sources and comile it in a local folder?
 - [ ] asDataUrl / base64 - obtain mimetype with IM if user don't give.
@@ -7,6 +8,7 @@
 - [ ] promise. a.then().then() - then() should return a promise resolved w return value or promise like A+
 - [ ] move support , promise, IOUtil and others to separate project named zero-magic
 - [ ] call({files: [File.fromUrl()]}) - support input files as promises
+- [ ] playground : let user edit commands
 - [x] browser example
 - [x] test for native IM
 - [x] test for node.js magica api
