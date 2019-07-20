@@ -24,7 +24,9 @@ class IOUtil {
 		#if js
 		untyped if (((typeof(window) == 'undefined' || typeof(window.fetch) == 'undefined') && typeof(process) != 'undefined')) {
 			try {
-				var stdout = untyped require('child_process').execSync(cmd + ' ' + args.map(a -> '"${a.replace(~/hello/g, '\\"')}"').join(" "));
+				var stdout = untyped require('child_process').execSync(cmd + ' ' + args.map(a->'"${a}"').join(" ")); // TODO: escape quotes in args or use execFileSync instead        
+        // '"${args.map(a -> ~/\"/g.replace(a, '\\"')).join(" ")}"');
+        // '"${a.replace(~/\"/g, '\\"')}"').join(" "));
 				return {code: 0, stdout: stdout.toString(), stderr: ''};
 			} catch (error:Dynamic) {
 				return {code: error.code, stdout: '', stderr: error.stderr}; // TODO: stderr, code verify
