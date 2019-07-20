@@ -17,7 +17,26 @@ class FileTest implements utest.ITest {
 
 	public function testImageUtilidentical(async:Async) {
 		ImageUtil.identical(File.fromFile('test/assets/bluebells.png', true), File.fromFile('test/assets/expects/convertNoInput.gif', true)).then(result -> {
-			Assert.isTrue(true);
+			Assert.isFalse(result);
+			async.done();
+		});
+	}
+
+	// @:timeout(5500)
+	public function testImageUtilidentical3(async:Async) {
+		ImageUtil.identical(File.fromFile('test/assets/expects/convertNoInput.gif', true), File.fromFile('test/assets/expects/convertNoInput.gif', true))
+			.then(result -> {
+			Assert.isTrue(result);
+			async.done();
+		});
+	}
+
+	@:timeout(5500)
+	public function testFileFromUrl(async:Async) {
+		var url = 'https://cancerberosgx.github.io/demos/magica/images/parrots_orig.png';
+		File.fromUrl(url).then(file -> {
+      // trace(file);
+			Assert.same(file.name, 'parrots_orig.png');
 			async.done();
 		});
 	}
