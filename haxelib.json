@@ -15,6 +15,7 @@
     "jpeg",
     "imagemagick",
     "gif",
+    "browser",
     "animation",
     "tiff",
     "transformation",
@@ -25,13 +26,12 @@
     "scale",
     "bmp"
   ],
-  "description": "Portable API for ImageMagick commands supporting all targets including Node.js and browser.",
-  "version": "0.0.1",
+  "description": "API for execute ImageMagick commands like convert, identify, etc. Supports all targets including Node.js and the browser.",
+  "version": "0.0.2",
   "releasenote": "initial design",
   "contributors": [
     "cancerberosgx"
   ],
   "classPath": "src",
-  "dependencies": {
-  }
+  "dependencies": {}
 }

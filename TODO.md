@@ -10,4 +10,5 @@
 - [x] browser example
 - [x] test for native IM
 - [x] test for node.js magica api
-- 
+- [x] api docs
+- [x] playground app

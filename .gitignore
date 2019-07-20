@@ -4,5 +4,5 @@ bkps
 tmp*
 dump
 *.zip
-# browser-project
-docs
+working_tmp
+types.xml

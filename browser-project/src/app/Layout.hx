@@ -9,15 +9,6 @@ import app.*;
 using StringTools;
 using magic.ArrayExtensions;
 
-// <h3>Example code</h3>
-// <textarea class="exampleCode">${this.props.state.example.getSource()}</textarea>
-// <!--
-// <button class="shapes ${this.props.state.example.getName() == 'shapes' ? 'selected' : ''}">Shapes</button>
-// <button class="convolutions ${this.props.state.example.getName() == 'convolutions' ? 'selected' : ''}">Convolutions</button>
-// <button class="affine ${this.props.state.example.getName() == 'affine' ? 'selected' : ''}">Affine</button>
-// <button class="pixelize ${this.props.state.example.getName() == 'pixelize' ? 'selected' : ''}">Pixelize</button>
-// <button class="text ${this.props.state.example.getName() == 'text' ? 'selected' : ''}">Text</button>
-// -->
 class Layout extends Component<Component.Props> {
 	override public function render() {
 		return '
@@ -64,12 +55,7 @@ ${Styles.css}
 	}
 
 	override function afterRender() {
-		// queryOne('.shapes').addEventListener('click', e -> exampleSelected('shapes'));
-		// queryOne('.convolutions').addEventListener('click', e -> exampleSelected('convolutions'));
-		// queryOne('.affine').addEventListener('click', e -> exampleSelected('affine'));
-		// queryOne('.pixelize').addEventListener('click', e -> exampleSelected('pixelize'));
 		queryOne('.identify').addEventListener('click', e -> exampleSelected('identify'));
-		// queryOne('.text').addEventListener('click', e -> exampleSelected('text'));
 		queryOne('.getSource').addEventListener('click', e -> (cast queryOne('.exampleCode')).scrollIntoViewIfNeeded());
 		queryOne('.loadFile').addEventListener('change', e -> {
 			magic.File.fromHtmlFileInputElement(e.currentTarget).then(files -> Store.getInstance().setState({
@@ -78,8 +64,6 @@ ${Styles.css}
           stdout: this.props.state.stdout,
           stderr: this.props.state.stderr,
           outputFiles: this.props.state.outputFiles
-					// output: [for (i in 0...5) bitmaps[0].clone()],
-					// bitmap: bitmaps[0]
 				}));
 		});
 		var i = 0;
@@ -102,23 +86,5 @@ ${Styles.css}
 						inputFiles: this.props.state.inputFiles
 					});
     });
-  // if (name == 'shapes') {
-	// 		ex = new Shapes();
-	// 	}  
-    // else {
-		// 	throw "example not recognized";
-		// }
-		// if (ex != null) {
-			// ex.run({
-			// 	bitmap: this.props.state.bitmap,
-			// 	done: result -> {
-			// 		Store.getInstance().setState({
-			// 			example: ex,
-			// 			output: result.output,
-			// 			bitmap: this.props.state.bitmap
-			// 		});
-			// 	}
-			// });
-		// }
 	}
 }

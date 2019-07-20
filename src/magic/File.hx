@@ -69,7 +69,6 @@ class File {
     return fromBase64(Util.urlToBase64(dataUrl), name);
 	}
 
-
 	#if js
   	/**
 	 * Loads files from files in html input element of type "file"
@@ -85,6 +84,16 @@ class File {
         return file;
 			}));
 	}
+  // public function asGlob() {
+  // 	jsBrowser.window.fetch(url).then(response -> response.blob()).then(blob -> {
+
+  // }
+	// 		var a = cast(Browser.document.createElement("a"), AnchorElement);
+	// 		a.href = js.html.URL.createObjectURL(blob);
+	// 		a.setAttribute("download", filename);
+	// 		a.click();
+	// 	});
+
 	#end
 
 }

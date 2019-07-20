@@ -2,7 +2,7 @@ sh scripts/prepare.sh && \
 node scripts/patch.js && \
 sh scripts/clean.sh && \
 sh scripts/pack.sh && \
-haxelib submit bitmap.zip && \
+haxelib submit magic.zip && \
 sh scripts/clean.sh 
 
 CODE="$?"
