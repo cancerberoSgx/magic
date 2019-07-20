@@ -15,10 +15,17 @@
     "jpeg",
     "imagemagick",
     "gif",
+    "animation",
     "tiff",
+    "transformation",
+    "color",
+    "morphology",
+    "convolution",
+    "rotate",
+    "scale",
     "bmp"
   ],
-  "description": "Portable API for ImageMagick `convert` commands. Supports all targets including Node.js and browser.",
+  "description": "Portable API for ImageMagick commands supporting all targets including Node.js and browser.",
   "version": "0.0.1",
   "releasenote": "initial design",
   "contributors": [

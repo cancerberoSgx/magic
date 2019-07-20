@@ -7,7 +7,20 @@ typedef ExecResult = {
 }
 
 class IOUtil {
-	public static function execSync(cmd:String, args:Array<String>):ExecResult {
+  public static function fileExists(path:String):Bool {
+		#if js
+		untyped if (((typeof(window) == 'undefined' || typeof(window.fetch) == 'undefined') && typeof(process) != 'undefined')) {
+		untyped	return require('fs').existsSync(path);
+		} else {
+			throw "Not available in the browser";
+		}
+		#else
+		return sys.FileSystem.exists(path);
+		#end
+	}
+
+
+	public static function execFileSync(cmd:String, args:Array<String>):ExecResult {
 		#if js
 		untyped if (((typeof(window) == 'undefined' || typeof(window.fetch) == 'undefined') && typeof(process) != 'undefined')) {
 			try {
@@ -17,7 +30,7 @@ class IOUtil {
 				return {code: error.code, stdout: '', stderr: error.stderr}; // TODO: stderr, code verify
 			}
 		} else {
-			throw "Exec not available in the browser";
+			throw "Not available in the browser";
 		}
 		#else
 		var process = new sys.io.Process(cmd, args);

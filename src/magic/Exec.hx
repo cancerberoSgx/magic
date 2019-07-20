@@ -11,7 +11,7 @@ class Exec {
 	}
 
 	public static function commandThrows(cmd:String, args:Array<String>, ?stdoutIncludes:String):Bool {
-    var p = IOUtil.execSync(cmd, args);
+    var p = IOUtil.execFileSync(cmd, args);
 		if (p.code != 0) {
 			return true;
 		} else {

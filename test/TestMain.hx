@@ -9,7 +9,7 @@ class TestMain {
 		runner.addCase(new PromiseTest());
     runner.addCase(new ExecTest());
     runner.addCase(new MagicTest());
-    
+    runner.addCase(new FileTest());
 		Report.create(runner);
 		runner.run();
 	}
