@@ -1,5 +1,6 @@
 package magic;
 
+import magic.Magica;
 import magic.*;
 import haxe.io.*;
 
@@ -38,7 +39,7 @@ class File {
 
 	/** Creates a DataUrl like `data:image/png;name=f.png;base64,` using given base64 content, mimeType and fileName. 
 	 * TODO: - [ ] asDataUrl / base64 - obtain mimetype with IM if user don't give.
-				- [ ] store file mimetype in property for future use.**/
+						- [ ] store file mimetype in property for future use.**/
 	public function asDataUrl(mime:String) {
 		return File.toDataUrl(this, mime);
 	}
@@ -52,6 +53,33 @@ class File {
 		- [ ] store file mimetype in property for future use.**/
 	public static function toDataUrl(file:File, mime:String) {
 		return 'data:' + mime + ';' + file.name + ';base64,' + toBase64(file);
+	}
+
+	/**
+	 * Given a filesystem path or a url it will first check if the file exists (if applies) , if so returning that file, or if not loading the file from url.
+	 */
+	public static function resolve(path:String):Promise<Null<File>> {
+		if (IOUtil.fileExists(path, true)) {
+			return Promise.resolve(File.fromFile(path));
+		} else {
+			return File.fromUrl(path);
+		}
+	}
+
+	/**
+	 * returns an object that can be used as an input file in Magica.
+	 */
+	public function toMagicaFile():MagicaFile {
+		return {
+			name: this.name,
+			content: untyped this.content.getData().bytes
+		};
+	}
+  	/**
+	 * builds a file from a Magica file object.
+	 */
+	public static function fromMagicaFile(f:MagicaFile):File {
+		return new File(f.name, haxe.io.Bytes.ofData(cast f.content));
 	}
 
 	/** Returns base64 representation of this image in an ecoded format like PNG  **/

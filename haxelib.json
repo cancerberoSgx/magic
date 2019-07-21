@@ -27,7 +27,7 @@
     "bmp"
   ],
   "description": "API for execute ImageMagick commands like convert, identify, etc. Supports all targets including Node.js and the browser.",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "releasenote": "See commits https://github.com/cancerberoSgx/magic/commits/master",
   "contributors": [
     "cancerberosgx"

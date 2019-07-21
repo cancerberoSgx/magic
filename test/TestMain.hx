@@ -12,6 +12,7 @@ class TestMain {
     runner.addCase(new FileTest());
     #if js
     runner.addCase(new MagicaNodeTest());
+    runner.addCase(new MagicRunTest());
     #end
 		Report.create(runner);
 		runner.run();

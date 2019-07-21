@@ -9,6 +9,7 @@
 - [ ] move support , promise, IOUtil and others to separate project named zero-magic
 - [ ] call({files: [File.fromUrl()]}) - support input files as promises
 - [ ] playground : let user edit commands
+- [ ] Magic.exec() should support multiple commands: un multiple times for support muktiple commands ore enable magica api to do that
 - [x] browser example
 - [x] test for native IM
 - [x] test for node.js magica api

@@ -7,7 +7,7 @@ import magic.Magic.MagicResults;
 class MagicaDispatcher implements Dispatcher {
 	public function new() {}
 
-	private static function getMagicaEntryPoint() {
+	public static function getMagicaEntryPoint():Promise<Magica> {
 		untyped if (typeof(window) != 'undefined'
 			&& typeof(window.Magica) != 'undefined'
 			&& typeof(window.Magica.main) == 'function') {
@@ -25,13 +25,10 @@ class MagicaDispatcher implements Dispatcher {
 			getMagicaEntryPoint().then(magica -> {
 				magica.main({
 					command: o.command,
-					inputFiles: o.files.map(f -> {
-						name: f.name,
-						content: untyped f.content.getData().bytes
-					})
+					inputFiles: o.files.map(f -> f.toMagicaFile())
 				}).then(magicaResults -> {
 					var r:MagicResults = {
-						files: magicaResults.outputFiles.map(f -> new File(f.name, haxe.io.Bytes.ofData(f.content))),
+						files: magicaResults.outputFiles.map(File.fromMagicaFile),
 						stdout: magicaResults.stdout.join('\n'),
 						stderr: magicaResults.stderr.join('\n'),
 						error: magicaResults.error,

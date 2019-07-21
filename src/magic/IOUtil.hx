@@ -7,12 +7,16 @@ typedef ExecResult = {
 }
 
 class IOUtil {
-	public static function fileExists(path:String):Bool {
+	public static function fileExists(path:String, ?dontThrow = false):Bool {
 		#if js
 		untyped if (((typeof(window) == 'undefined' || typeof(window.fetch) == 'undefined') && typeof(process) != 'undefined')) {
 			untyped return require('fs').existsSync(path);
 		} else {
-			throw "Not available in the browser";
+			if (!dontThrow) {
+				throw "Not available in the browser";
+			} else {
+				return false;
+			}
 		}
 		#else
 		return sys.FileSystem.exists(path);
@@ -23,7 +27,7 @@ class IOUtil {
 		#if js
 		untyped if (((typeof(window) == 'undefined' || typeof(window.fetch) == 'undefined') && typeof(process) != 'undefined')) {
 			try {
-        var c = cmd + ' ' + args.map(a -> '"${a}"').join(" ");
+				var c = cmd + ' ' + args.map(a -> '"${a}"').join(" ");
 				var stdout = untyped require('child_process')
 					.execSync(c, cwd == null ? null : {cwd: cwd}); // TODO: escape quotes in args or use execFileSync instead
 				return {code: 0, stdout: stdout.toString(), stderr: ''};
@@ -38,7 +42,7 @@ class IOUtil {
 		if (cwd != null) {
 			Sys.setCwd(cwd);
 		}
-		var process:sys.io.Process=null;
+		var process:sys.io.Process = null;
 		try {
 			process = new sys.io.Process(cmd, args);
 			var result = {
@@ -57,7 +61,7 @@ class IOUtil {
 			if (cwd != null) {
 				Sys.setCwd(previousCwd);
 			}
-      throw e;
+			throw e;
 		}
 		#end
 	}
