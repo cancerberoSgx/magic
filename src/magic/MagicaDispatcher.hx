@@ -8,6 +8,7 @@ class MagicaDispatcher implements Dispatcher {
 	public function new() {}
 
 	public static function getMagicaEntryPoint():Promise<Magica> {
+		#if js
 		untyped if (typeof(window) != 'undefined'
 			&& typeof(window.Magica) != 'undefined'
 			&& typeof(window.Magica.main) == 'function') {
@@ -18,6 +19,9 @@ class MagicaDispatcher implements Dispatcher {
 		} else {
 			throw "Library magica is not available";
 		}
+		#else
+		throw "Magica API currently not available in non js targets";
+		#end
 	}
 
 	public function call(o:MagicCallOptions):Promise<MagicResults> {
@@ -25,6 +29,7 @@ class MagicaDispatcher implements Dispatcher {
 			getMagicaEntryPoint().then(magica -> {
 				magica.main({
 					command: o.command,
+					debug: o.debug != null,
 					inputFiles: o.files.map(f -> f.toMagicaFile())
 				}).then(magicaResults -> {
 					var r:MagicResults = {
@@ -81,6 +86,7 @@ class MagicaDispatcher implements Dispatcher {
 	}
 
 	static function checkMagicaInstall() {
+		#if js
 		// TODO: platform paths: do we really need to support backslashes for windows?
 		if (!IOUtil.fileExists(magicaFolder()) || !IOUtil.fileExists(magicaFolder() + '/node_modules/magica')) {
 			return false;
@@ -93,15 +99,23 @@ class MagicaDispatcher implements Dispatcher {
 			trace('error while requiring magica: ', ex);
 			return false;
 		}
+		#else
+		return false;
+		#end
+		return false;
 	}
 
 	static function magicaFolder():String {
+		#if js
 		untyped var ss:String = process.env.HOME + '';
 		ss = ~/\\/g.replace(ss, '/');
 		return ss + '/.magic/magic-npm-project';
+		#end
+		throw "Magica API currently not available in non js targets";
 	}
 
 	static function ensureMagicaInstall() {
+		#if js
 		if (!checkMagicaInstall()) {
 			// TODO: platform paths: do we really need to support backslashes for windows?
 			if (!IOUtil.fileExists(magicaFolder())) {
@@ -111,12 +125,10 @@ class MagicaDispatcher implements Dispatcher {
 			if (!IOUtil.fileExists(magicaFolder() + '/package.json')) {
 				var r = IOUtil.execFileSync('npm', ['init', '-y'], magicaFolder());
 				if (r.code != 0) {
-					// trace('There where problems installing npm package magica. - when executing npm init -y ', ['init', '-y'], magicaFolder());
 					throw 'There where problems installing npm package magica. - when executing npm init -y ' + ['init', '-y', magicaFolder()].join(' ');
 				}
 			}
 			var r = IOUtil.execFileSync('npm', ['install', '--save', 'magica'], magicaFolder());
-			//  npm install --prefix /my/project/root
 			if (r.code != 0) {
 				trace('There where problems installing npm package magica. - when executing npm install ' + ['install', '--save', 'magica', magicaFolder()]
 					.join(' '),
@@ -127,5 +139,7 @@ class MagicaDispatcher implements Dispatcher {
 			return checkMagicaInstall();
 		}
 		return true;
+		#end
+		throw "Magica API currently not available in non js targets";
 	}
 }

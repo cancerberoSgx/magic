@@ -7,7 +7,6 @@ typedef MagicaRunOptions = {
 	 * An ImageMagick command, for example: `['convert', 'foo/bar.png', '-scale', '50%', 'out.gif']`
 	 */
 	var script:String;
-  @:optional var debug:Bool;
 };
 
 typedef MagicaBaseOptions = {
@@ -17,6 +16,7 @@ typedef MagicaBaseOptions = {
 	 * Otherwise it will be considered a url. In later cases, the filename will be the base name of file or url.
 	 */
 	var inputFiles:Array<MagicaFile>;
+  @:optional var debug:Bool;
 };
 
 typedef MagicaMainOptions = {
