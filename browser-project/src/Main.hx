@@ -1,9 +1,9 @@
 package;
 
+import magic.File;
 import js.Browser.*;
 import app.*;
 import examples.Example.Examples;
-import magic.*;
 
 class Main {
 	public static function main() {
@@ -18,16 +18,15 @@ class Main {
 				outputFiles: [],
 				stdout: '',
 				stderr: '',
-				command: []
+				script: ''
 			};
-			initialState.command = ex.command(initialState);
+			initialState.script = ex.script(initialState);
 			Store.init(initialState);
 			Store.getInstance().addStateChangeListener({
-				onStateChange: (old:State, newState:State) -> {
-					Component.renderDom(document.querySelector('#main'), new Layout({state: newState}));
-				}
+				onStateChange: (old:State, newState:State) -> Component.renderDom(document.querySelector('#main'), new Layout({state: newState}))
 			});
 			Store.getInstance().setState(initialState);
+			Dispatcher.executeExample();
 		});
 	}
 }

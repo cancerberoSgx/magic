@@ -1,7 +1,7 @@
 package app;
 
 class Styles {
-  public static var css = '  
+	public static var css = '  
 body {
   background: linear-gradient(45deg, rgb(209, 192, 192) 25%, transparent 26%, transparent 75%, rgb(209, 192, 192) 76%),
     linear-gradient(-45deg, rgb(209, 192, 192) 25%, transparent 26%, transparent 75%, rgb(209, 192, 192) 76%);
@@ -20,6 +20,9 @@ table {
 }
 .selected {
   border: 2px solid pink;
+}
+.inline {
+  display: inline;
 }
   ';
 }
