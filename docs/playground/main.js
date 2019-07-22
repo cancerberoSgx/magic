@@ -75,6 +75,39 @@ Std.__name__ = true;
 Std.string = function(s) {
 	return js_Boot.__string_rec(s,"");
 };
+var StringTools = function() { };
+StringTools.__name__ = true;
+StringTools.isSpace = function(s,pos) {
+	var c = HxOverrides.cca(s,pos);
+	if(!(c > 8 && c < 14)) {
+		return c == 32;
+	} else {
+		return true;
+	}
+};
+StringTools.ltrim = function(s) {
+	var l = s.length;
+	var r = 0;
+	while(r < l && StringTools.isSpace(s,r)) ++r;
+	if(r > 0) {
+		return HxOverrides.substr(s,r,l - r);
+	} else {
+		return s;
+	}
+};
+StringTools.rtrim = function(s) {
+	var l = s.length;
+	var r = 0;
+	while(r < l && StringTools.isSpace(s,l - r - 1)) ++r;
+	if(r > 0) {
+		return HxOverrides.substr(s,0,l - r);
+	} else {
+		return s;
+	}
+};
+StringTools.trim = function(s) {
+	return StringTools.ltrim(StringTools.rtrim(s));
+};
 var app_Component = function(p) {
 	this.props = p;
 };
@@ -1037,6 +1070,16 @@ magic_File.fromUrl = function(url) {
 magic_File.toDataUrl = function(file,mime) {
 	return "data:" + mime + ";" + file.name + ";base64," + magic_File.toBase64(file);
 };
+magic_File.resolve = function(path) {
+	if(magic_IOUtil.fileExists(path,true)) {
+		return magic_Promise.resolve(magic_File.fromFile(path));
+	} else {
+		return magic_File.fromUrl(path);
+	}
+};
+magic_File.fromMagicaFile = function(f) {
+	return new magic_File(f.name,haxe_io_Bytes.ofData(f.content));
+};
 magic_File.toBase64 = function(file) {
 	return haxe_crypto_Base64.encode(file.content);
 };
@@ -1080,15 +1123,23 @@ magic_File.prototype = {
 	,asBase64: function(file) {
 		return magic_File.toBase64(file);
 	}
+	,toMagicaFile: function() {
+		return { name : this.name, content : this.content.b.bufferValue.bytes};
+	}
 	,__class__: magic_File
 };
 var magic_IOUtil = function() { };
 magic_IOUtil.__name__ = true;
-magic_IOUtil.fileExists = function(path) {
+magic_IOUtil.fileExists = function(path,dontThrow) {
+	if(dontThrow == null) {
+		dontThrow = false;
+	}
 	if((typeof(window) == "undefined" || typeof(window.fetch) == "undefined") && typeof(process) != "undefined") {
 		return require("fs").existsSync(path);
-	} else {
+	} else if(!dontThrow) {
 		throw new js__$Boot_HaxeError("Not available in the browser");
+	} else {
+		return false;
 	}
 };
 magic_IOUtil.execFileSync = function(cmd,args,cwd) {
@@ -1178,22 +1229,41 @@ magic_Magic.call = function(o) {
 		return;
 	});
 };
-magic_Magic.exec = function(o) {
+magic_Magic.run = function(o) {
 	return new magic_Promise(function(resolve) {
-		magic_Magic.execToCallOptions(o).then(function(callOptions) {
-			return new magic_Promise(function(resolve1) {
-				magic_Dispatch.get().then(function(dispatcher) {
-					dispatcher.call(callOptions).then(resolve1);
+		magic_MagicaDispatcher.isMagicaApiAvailable().then(function(magicaAvailable) {
+			if(!magicaAvailable) {
+				throw new js__$Boot_HaxeError("Magic.run() is currently only available in JS targets using magica API. Use Magic.call() instead.");
+			}
+			magic_MagicaDispatcher.getMagicaEntryPoint().then(function(magica) {
+				if(magica == null) {
+					throw new js__$Boot_HaxeError("Magica API not available");
+				}
+				var inputFiles = o.files == null ? [] : o.files;
+				magic_Promise.all((o.filePaths == null ? [] : o.filePaths).map(magic_File.resolve)).then(function(files) {
+					var inputFiles1 = files.filter(function(f) {
+						return f != null;
+					});
+					inputFiles = inputFiles.concat(inputFiles1);
+					var options = { debug : o.debug, script : StringTools.trim(o.command), inputFiles : inputFiles.map(function(f1) {
+						return f1.toMagicaFile();
+					})};
+					magica.run(options).then(function(r) {
+						var result = { results : r.results.map(magic_Magic.magicaToMagicResult), stdout : r.stdout, stderr : r.stderr, files : r.outputFiles.map(magic_File.fromMagicaFile), code : r.error == null ? 0 : 1, error : r.error};
+						resolve(result);
+						return;
+					});
 					return;
 				});
 				return;
 			});
+			return;
 		});
 		return;
 	});
 };
-magic_Magic.execToCallOptions = function(o) {
-	throw new js__$Boot_HaxeError("not Implemented");
+magic_Magic.magicaToMagicResult = function(r) {
+	return { error : r.error, code : r.error == null ? 0 : 1, stdout : r.stdout.join("\n"), stderr : r.stderr.join("\n"), files : r.outputFiles.map(magic_File.fromMagicaFile)};
 };
 var magic_MagicaDispatcher = function() {
 };
@@ -1220,11 +1290,11 @@ magic_MagicaDispatcher.isMagicaApiAvailable = function() {
 					magic_MagicaDispatcher._isMagicaApiAvailable = true;
 					resolve(true);
 				} else {
-					haxe_Log.trace("There where problems installing npm package magica. 22222",{ fileName : "magic/MagicaDispatcher.hx", lineNumber : 62, className : "magic.MagicaDispatcher", methodName : "isMagicaApiAvailable"});
+					haxe_Log.trace("There where problems installing npm package magica. 22222",{ fileName : "magic/MagicaDispatcher.hx", lineNumber : 64, className : "magic.MagicaDispatcher", methodName : "isMagicaApiAvailable"});
 					resolve(false);
 				}
 			} else {
-				haxe_Log.trace("There where problems installing npm package magica.",{ fileName : "magic/MagicaDispatcher.hx", lineNumber : 66, className : "magic.MagicaDispatcher", methodName : "isMagicaApiAvailable"});
+				haxe_Log.trace("There where problems installing npm package magica.",{ fileName : "magic/MagicaDispatcher.hx", lineNumber : 68, className : "magic.MagicaDispatcher", methodName : "isMagicaApiAvailable"});
 				resolve(false);
 			}
 		} else if(typeof(window) != "undefined" && typeof(window.Magica) != "undefined" && typeof(window.Magica.main) == "function") {
@@ -1247,7 +1317,7 @@ magic_MagicaDispatcher.checkMagicaInstall = function() {
 			return false;
 		}
 	} catch( ex ) {
-		haxe_Log.trace("error while requiring magica: ",{ fileName : "magic/MagicaDispatcher.hx", lineNumber : 96, className : "magic.MagicaDispatcher", methodName : "checkMagicaInstall", customParams : [Std.string(((ex) instanceof js__$Boot_HaxeError) ? ex.val : ex)]});
+		haxe_Log.trace("error while requiring magica: ",{ fileName : "magic/MagicaDispatcher.hx", lineNumber : 99, className : "magic.MagicaDispatcher", methodName : "checkMagicaInstall", customParams : [Std.string(((ex) instanceof js__$Boot_HaxeError) ? ex.val : ex)]});
 		return false;
 	}
 };
@@ -1272,7 +1342,7 @@ magic_MagicaDispatcher.ensureMagicaInstall = function() {
 		}
 		var r1 = magic_IOUtil.execFileSync("npm",["install","--save","magica"],magic_MagicaDispatcher.magicaFolder());
 		if(r1.code != 0) {
-			haxe_Log.trace("There where problems installing npm package magica. - when executing npm install " + ["install","--save","magica",magic_MagicaDispatcher.magicaFolder()].join(" "),{ fileName : "magic/MagicaDispatcher.hx", lineNumber : 124, className : "magic.MagicaDispatcher", methodName : "ensureMagicaInstall", customParams : [r1]});
+			haxe_Log.trace("There where problems installing npm package magica. - when executing npm install " + ["install","--save","magica",magic_MagicaDispatcher.magicaFolder()].join(" "),{ fileName : "magic/MagicaDispatcher.hx", lineNumber : 133, className : "magic.MagicaDispatcher", methodName : "ensureMagicaInstall", customParams : [r1]});
 			throw new js__$Boot_HaxeError("There where problems installing npm package magica. - when executing npm install " + ["install","--save","magica",magic_MagicaDispatcher.magicaFolder()].join(" "));
 		}
 		return magic_MagicaDispatcher.checkMagicaInstall();
@@ -1283,14 +1353,10 @@ magic_MagicaDispatcher.prototype = {
 	call: function(o) {
 		return new magic_Promise(function(resolve) {
 			magic_MagicaDispatcher.getMagicaEntryPoint().then(function(magica) {
-				var o1 = o.command;
-				var tmp = o.files.map(function(f) {
-					return { name : f.name, content : f.content.b.bufferValue.bytes};
-				});
-				magica.main({ command : o1, inputFiles : tmp}).then(function(magicaResults) {
-					var r = { files : magicaResults.outputFiles.map(function(f1) {
-						return new magic_File(f1.name,haxe_io_Bytes.ofData(f1.content));
-					}), stdout : magicaResults.stdout.join("\n"), stderr : magicaResults.stderr.join("\n"), error : magicaResults.error, code : magicaResults.error == null ? 0 : 1};
+				magica.main({ command : o.command, debug : o.debug != null, inputFiles : o.files.map(function(f) {
+					return f.toMagicaFile();
+				})}).then(function(magicaResults) {
+					var r = { files : magicaResults.outputFiles.map(magic_File.fromMagicaFile), stdout : magicaResults.stdout.join("\n"), stderr : magicaResults.stderr.join("\n"), error : magicaResults.error, code : magicaResults.error == null ? 0 : 1};
 					resolve(r);
 					return;
 				});
@@ -1336,6 +1402,28 @@ var magic_Promise = function(fn) {
 	});
 };
 magic_Promise.__name__ = true;
+magic_Promise.all = function(a) {
+	if(a.length == 0) {
+		return magic_Promise.resolve([]);
+	}
+	return new magic_Promise(function(resolve) {
+		var resolved = [];
+		var f = function(t) {
+			haxe_Log.trace(t,{ fileName : "magic/Promise.hx", lineNumber : 30, className : "magic.Promise", methodName : "all", customParams : ["jksdkjdskjdsjkds"]});
+			resolved.push(t);
+			if(resolved.length == a.length) {
+				resolve(resolved);
+			}
+		};
+		var _g = 0;
+		while(_g < a.length) {
+			var p = a[_g];
+			++_g;
+			p.then(f);
+		}
+		return;
+	});
+};
 magic_Promise.resolve = function(t) {
 	return new magic_Promise(function(resolve) {
 		resolve(t);
@@ -1406,7 +1494,7 @@ examples_Examples.list = [{ name : "scale-rotate", command : function(state) {
 examples_SampleImages.list = ["bluebells.png","bridge.psd","challenge.gif","photo.tiff","whale4.jpg","wand.ico"];
 haxe_crypto_Base64.CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 haxe_crypto_Base64.BYTES = haxe_io_Bytes.ofString(haxe_crypto_Base64.CHARS);
-magic_Magic.config = { ignoreNativeIM : false, magicaOnlyBrowser : false, ignoreMagica : false};
+magic_Magic.config = { ignoreNativeIM : false, magicaOnlyBrowser : false, debug : false, ignoreMagica : false};
 Main.main();
 })(typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);
 
