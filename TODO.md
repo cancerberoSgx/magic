@@ -8,7 +8,9 @@
 - [ ] move support.* classes, promise, IOUtil and others to separate project named zero-magic
 - [ ] call({files: [File.fromUrl()]}) - support input files as promises
 - [ ] working... feedback
+- [ ] browser tests
 - [ ] playground - initial paragraphs in a "about" modal
+- [ ] a playground together with bitmap, in c++? app - use magic for load/save and slow complex transforms and bitmap for fast ones(convolutions, affine, etc).
 - [x] playground : let user edit commands
 - [x] Magic.exec() should support multiple commands: un multiple times for support muktiple commands ore enable magica api to do that
 - [x] commands as string using clitoarray
