@@ -5,9 +5,11 @@
   - [ ] store file mimetype in property for future use.
 - [ ] File fromGLob / toGlob - easy download glob url build.
 - [ ] promise. a.then().then() - then() should return a promise resolved w return value or promise like A+
-- [ ] move support , promise, IOUtil and others to separate project named zero-magic
+- [ ] move support.* classes, promise, IOUtil and others to separate project named zero-magic
 - [ ] call({files: [File.fromUrl()]}) - support input files as promises
-- [ ] playground : let user edit commands
+- [ ] working... feedback
+- [ ] playground - initial paragraphs in a "about" modal
+- [x] playground : let user edit commands
 - [x] Magic.exec() should support multiple commands: un multiple times for support muktiple commands ore enable magica api to do that
 - [x] commands as string using clitoarray
 - [x] browser example

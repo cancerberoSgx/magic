@@ -1,5 +1,6 @@
 package app;
 
+import js.html.ImageElement;
 import js.html.TextAreaElement;
 import magic.File;
 import examples.Example.Examples;
@@ -14,8 +15,6 @@ class Layout extends Component<Component.Props> {
 <p>Welcome to <a href="https://github.com/cancerberoSgx/magic">magic</a> playground, a <a href="https://haxe.org" rel="nofollow">Haxe</a> API for running <a href="https://github.com/ImageMagick/ImageMagick">ImageMagick</a> commands like <code>convert</code>, <code>identify</code>, supporting all haxe targets, <strong>even the browser</strong> (!) thanks to <a href="https://cancerberosgx.github.io/magica/" rel="nofollow">magica</a>, an <a href="https://emscripten.org/" rel="nofollow">emscripten</a> port of <a href="https://github.com/ImageMagick/ImageMagick">ImageMagick</a> that allows to programmatically call its <code>convert</code>, <code>identify</code>, etc. commands in a programmatic way.</p>
 
 <p>Load images from your system or urls. <strong>A lot of formats are supported!</strong> like png, jpg, gif, tiff, bmp, tga, psd, ps, pdf, svg, heic, dpx, etc. Click on output images to download them. Edit the commands and run them again. Check for logs and errors. Checkout the example list to search for something similar you want to accomplish.</p>
-
-<br/>
 
 <h3 class="inline">Examples</h3>
   <select class="examples">
@@ -55,7 +54,7 @@ class Layout extends Component<Component.Props> {
     <td>
       ${this.props.state.inputFiles.map(f->'
       <div class="inline-block">
-        <a href="#" class="input">${f.name} (${Math.round(f.content.length / 1000)} KB)</a>
+        <a href="#" class="input" data-name="${f.name}">${f.name} (${Math.round(f.content.length / 1000)} KB)</a>
         <br/>
         <img data-name="${f.name}" class="input" src="${f.asDataUrl('image/png')}"/> 
       </div>').join(" ")}
@@ -63,7 +62,7 @@ class Layout extends Component<Component.Props> {
     <td>    
     ${this.props.state.outputFiles.map(f-> '
       <div class="inline-block">
-        <a href="#" class="input"> ${f.name} (${Math.round(f.content.length / 1000)} KB)</a>
+        <a href="#" class="input" data-name="${f.name}"> ${f.name} (${Math.round(f.content.length / 1000)} KB)</a>
         <br/>
         <img data-name="${f.name}" class="output" src="${f.asDataUrl("image/png")}" />
       </div>').join(" ")}
@@ -101,6 +100,10 @@ ${Styles.css}
 		queryOne('.loadFile').addEventListener('change', e -> File.fromHtmlFileInputElement(e.currentTarget).then(Dispatcher.setInputFiles));
 
 		for (output in query('.output, .input'))
-			output.addEventListener('click', e -> Dispatcher.downloadFile(e.currentTarget.src, e.currentTarget.getAttribute('data-name')));
+			output.addEventListener('click', e -> {
+				var name = e.currentTarget.getAttribute('data-name');
+				var img = cast(queryOne('img[data-name="${name}"]'), ImageElement);
+				Dispatcher.downloadFile(img.src, name);
+			});
 	}
 }
