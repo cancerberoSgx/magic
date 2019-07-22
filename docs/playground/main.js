@@ -158,13 +158,12 @@ app_Dispatcher.__name__ = true;
 app_Dispatcher.executeExample = function(ex) {
 	var state = app_Store.getInstance().getState();
 	ex = ex == null ? state.example : ex;
-	var script = ex.script(state);
+	app_Dispatcher.execute(ex.script(state));
+};
+app_Dispatcher.execute = function(script) {
+	var state = app_Store.getInstance().getState();
 	magic_Magic.run({ command : script, files : state.inputFiles}).then(function(result) {
-		var tmp = app_Store.getInstance();
-		var result1 = result.files;
-		var tmp1 = result.stdout.join("\n");
-		var tmp2 = result.stderr.join("\n");
-		tmp.setState({ example : ex, outputFiles : result1, stdout : tmp1, stderr : tmp2, script : script, inputFiles : state.inputFiles});
+		app_Store.getInstance().setState({ example : state.example, outputFiles : result.files, stdout : result.stdout.join("\n"), stderr : result.stderr.join("\n"), script : script, inputFiles : state.inputFiles});
 		return;
 	});
 };
@@ -202,27 +201,27 @@ app_Layout.__super__ = app_Component;
 app_Layout.prototype = $extend(app_Component.prototype,{
 	render: function() {
 		var _gthis = this;
-		return "\n<h1>Magic playground</h1>\n\n<p>Welcome to <a href=\"https://github.com/cancerberoSgx/magic\">magic</a> playground, a <a href=\"https://haxe.org\" rel=\"nofollow\">Haxe</a> API for running <a href=\"https://github.com/ImageMagick/ImageMagick\">ImageMagick</a> commands like <code>convert</code>, <code>identify</code>, supporting all haxe targets, <strong>even the browser</strong> (!) thanks to <a href=\"https://cancerberosgx.github.io/magica/\" rel=\"nofollow\">magica</a>, an <a href=\"https://emscripten.org/\" rel=\"nofollow\">emscripten</a> port of <a href=\"https://github.com/ImageMagick/ImageMagick\">ImageMagick</a> that allows to programmatically call its <code>convert</code>, <code>identify</code>, etc. commands in a programmatic way.</p>\n\n<p>Load images from your system or urls. <strong>A lot of formats are supported!</strong> like png, jpg, gif, tiff, bmp, tga, psd, ps, pdf, svg, heic, dpx, etc. Click on output images to download them. Edit the commands and run them again. Check for logs and errors. Checkout the example list to search for something similar you want to accomplish.</p>\n\n<br />\n\n<h3 class=\"inline\">Examples</h3>\n<select class=\"examples\">\n  " + examples_Examples.list.map(function(e) {
+		return "\n<h1>Magic playground</h1>\n\n<p>Welcome to <a href=\"https://github.com/cancerberoSgx/magic\">magic</a> playground, a <a href=\"https://haxe.org\" rel=\"nofollow\">Haxe</a> API for running <a href=\"https://github.com/ImageMagick/ImageMagick\">ImageMagick</a> commands like <code>convert</code>, <code>identify</code>, supporting all haxe targets, <strong>even the browser</strong> (!) thanks to <a href=\"https://cancerberosgx.github.io/magica/\" rel=\"nofollow\">magica</a>, an <a href=\"https://emscripten.org/\" rel=\"nofollow\">emscripten</a> port of <a href=\"https://github.com/ImageMagick/ImageMagick\">ImageMagick</a> that allows to programmatically call its <code>convert</code>, <code>identify</code>, etc. commands in a programmatic way.</p>\n\n<p>Load images from your system or urls. <strong>A lot of formats are supported!</strong> like png, jpg, gif, tiff, bmp, tga, psd, ps, pdf, svg, heic, dpx, etc. Click on output images to download them. Edit the commands and run them again. Check for logs and errors. Checkout the example list to search for something similar you want to accomplish.</p>\n\n<br/>\n\n<h3 class=\"inline\">Examples</h3>\n  <select class=\"examples\">\n    " + examples_Examples.list.map(function(e) {
 			return "<option " + (_gthis.props.state.example.name == e.name ? "selected" : "") + " value=\"" + e.name + "\">" + e.name + "</option>";
-		}).join(" ") + "\n</select>\nDescription: " + this.props.state.example.description + "\n\n<br />\n\n\n<h3 class=\"inline\">Load Images</h3>\n<label>From file: \n  <input type=\"file\"  class=\"loadFile\"/></label>\n<label>Sample Image: \n  <select class=\"sample-images\">\n  " + examples_SampleImages.list.map(function(e1) {
+		}).join(" ") + "\n  </select>\n  Description: <em>" + this.props.state.example.description + "</em>\n<br/>\n\n\n<h3 class=\"inline\">Load Images</h3>\n<label>From file: \n  <input type=\"file\"  class=\"loadFile\"/>\n</label>\n<label>Sample Image: \n  <select class=\"sample-images\">\n  " + examples_SampleImages.list.map(function(e1) {
 			return "<option value=\"" + e1 + "\">" + e1 + "</option>";
-		}).join(" ") + "\n  </select>\n</label>\n<br />\n\n\n<h3>Commands</h3>\n\n<textarea class=\"command\">" + this.props.state.script + "</textarea>\n<br />\n\n<button class=\"execute\">Execute</button>\n<br />\n\n<h3>Input files</h3>\n\n" + this.props.state.inputFiles.map(function(f) {
-			return "\n<div class=\"image\">\n<img data-name=\"" + f.name + "\" class=\"input\" src=\"" + f.asDataUrl("image/png") + "\"/> \n<br/>\n<span><a href=\"#\" class=\"input\"> " + f.name + "</a> (" + Math.round(f.content.length / 1000) + " KB)</span>\n</div>";
-		}).join(" ") + "\n\n<h3>Output files</h3>\n" + this.props.state.outputFiles.map(function(f1) {
-			return "\n<div class=\"image\">\n<img data-name=\"" + f1.name + "\"  class=\"output\" src=\"" + f1.asDataUrl("image/png") + "\" />\n<br/>\n<span><a href=\"#\" class=\"input\"> " + f1.name + "</a> (" + Math.round(f1.content.length / 1000) + " KB)</span>\n</div>";
-		}).join(" ") + "\n<br/>\n\n<table>\n  <tr>\n    <td><h3>stdout</h3></td><td><h3>stderr</h3></td>\n  </tr>\n  <tr>\n    <td><textarea class=\"stdout\">" + this.props.state.stdout + "</textarea></td>\n    <td><textarea class=\"stderr\">" + this.props.state.stderr + "</textarea></td>\n  </tr>\n</table>\n\n<style>\n" + app_Styles.css + "\n</style>\n\n<a href=\"https://github.com/cancerberoSgx/magic\" style=\"opacity:0.6;position:fixed;padding:5px 45px;width:auto;top:30px;right:-60px; -webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);transform:rotate(45deg);box-shadow:0 0 0 3px #f6c304, 0 0 20px -3px rgba(0, 0, 0, 0.5);text-shadow:0 0 0 #555555, 0 0 5px rgba(0, 0, 0, 0.3);background-color:#f6c304;color:#555555;font-size:13px;font-family:sans-serif;text-decoration:none;font-weight:bold;border:2px dotted #555555;-webkit-backface-visibility:hidden;letter-spacing:.5px;\">Fork me on GitHub</a>\n";
+		}).join(" ") + "\n  </select>\n</label>\n<br/>\n\n<h3>Commands</h3>\n\n<textarea class=\"command\">" + this.props.state.script + "</textarea>\n\n<button class=\"execute\">Execute</button>\n\n<table>\n  <tr>\n    <td><h3>Input Images</h3></td>\n    <td><h3>Output Images</h3></td>\n  </tr>\n  <tr>\n    <td>\n      " + this.props.state.inputFiles.map(function(f) {
+			return "\n      <div class=\"inline-block\">\n        <a href=\"#\" class=\"input\">" + f.name + " (" + Math.round(f.content.length / 1000) + " KB)</a>\n        <br/>\n        <img data-name=\"" + f.name + "\" class=\"input\" src=\"" + f.asDataUrl("image/png") + "\"/> \n      </div>";
+		}).join(" ") + "\n    </td>\n    <td>    \n    " + this.props.state.outputFiles.map(function(f1) {
+			return "\n      <div class=\"inline-block\">\n        <a href=\"#\" class=\"input\"> " + f1.name + " (" + Math.round(f1.content.length / 1000) + " KB)</a>\n        <br/>\n        <img data-name=\"" + f1.name + "\" class=\"output\" src=\"" + f1.asDataUrl("image/png") + "\" />\n      </div>";
+		}).join(" ") + "\n    </td>\n  </tr>\n</table>\n\n<table>\n  <tr>\n    <td><h3>stdout</h3></td>\n    <td><h3>stderr</h3></td>\n  </tr>\n  <tr>\n    <td><textarea class=\"stdout\">" + this.props.state.stdout + "</textarea></td>\n    <td><textarea class=\"stderr\">" + this.props.state.stderr + "</textarea></td>\n  </tr>\n</table>\n\n<style>\n" + app_Styles.css + "\n</style>\n\n<a href=\"https://github.com/cancerberoSgx/magic\" style=\"opacity:0.6;position:fixed;padding:5px 45px;width:auto;top:30px;right:-60px; -webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);transform:rotate(45deg);box-shadow:0 0 0 3px #f6c304, 0 0 20px -3px rgba(0, 0, 0, 0.5);text-shadow:0 0 0 #555555, 0 0 5px rgba(0, 0, 0, 0.3);background-color:#f6c304;color:#555555;font-size:13px;font-family:sans-serif;text-decoration:none;font-weight:bold;border:2px dotted #555555;-webkit-backface-visibility:hidden;letter-spacing:.5px;\">Fork me on GitHub</a>\n";
 	}
 	,afterRender: function() {
-		this.queryOne(".execute").addEventListener("click",app_Dispatcher.executeExampleNamed);
-		this.queryOne(".sample-images").addEventListener("change",function(e) {
-			magic_File.fromUrl(e.currentTarget.value).then(function(file) {
+		var _gthis = this;
+		this.queryOne(".execute").addEventListener("click",function(e) {
+			app_Dispatcher.execute((js_Boot.__cast(_gthis.queryOne(".command") , HTMLTextAreaElement)).value);
+			return;
+		});
+		this.queryOne(".sample-images").addEventListener("change",function(e1) {
+			magic_File.fromUrl(e1.currentTarget.value).then(function(file) {
 				app_Dispatcher.setInputFiles([file]);
 				return;
 			});
-			return;
-		});
-		this.queryOne(".examples").addEventListener("change",function(e1) {
-			app_Dispatcher.executeExampleNamed(e1.currentTarget.value);
 			return;
 		});
 		this.queryOne(".examples").addEventListener("change",function(e2) {
@@ -1480,7 +1479,7 @@ Object.defineProperty(js__$Boot_HaxeError.prototype,"message",{ get : function()
 	return String(this.val);
 }});
 js_Boot.__toStr = ({ }).toString;
-app_Styles.css = "  \nbody {\n  background: linear-gradient(45deg, rgb(209, 192, 192) 25%, transparent 26%, transparent 75%, rgb(209, 192, 192) 76%),\n    linear-gradient(-45deg, rgb(209, 192, 192) 25%, transparent 26%, transparent 75%, rgb(209, 192, 192) 76%);\n  background-color: rgb(161, 179, 206);\n  background-size: 100px 100px;\n}\nimg {\n  cursor: pointer;\n}\ntextarea {\n  height: 122px;\n  width: 100%;\n}\ntable {\n  width: 100%;\n}\n.selected {\n  border: 2px solid pink;\n}\n.inline {\n  display: inline;\n}\n  ";
+app_Styles.css = "  \nbody {\n  background: linear-gradient(45deg, rgb(209, 192, 192) 25%, transparent 26%, transparent 75%, rgb(209, 192, 192) 76%),\n    linear-gradient(-45deg, rgb(209, 192, 192) 25%, transparent 26%, transparent 75%, rgb(209, 192, 192) 76%);\n  background-color: rgb(161, 179, 206);\n  background-size: 100px 100px;\n}\nimg {\n  cursor: pointer;\n}\ntextarea {\n  height: 80px;\n  width: 100%;\n}\ntable {\n  width: 100%;\n}\n.selected {\n  border: 2px solid pink;\n}\n.inline {\n  display: inline;\n}\n.inline-block {\n  display: inline-block;\n}\nh3 {\n  font-size: 1.1em;\n}\nh1 {\n  font-size: 1.3em;\n}\ntable{margin: 0.5em; padding: 0;}\n  ";
 examples_Examples.list = [{ name : "scale-rotate", script : function(state) {
 	return ["convert",state.inputFiles[0].name,"-scale","70%","-rotate","33","scaled-rotated.jpg"].join(" ");
 }, description : "Simple command that scale and rotates the image"},{ name : "identify", script : function(state1) {
@@ -1491,7 +1490,9 @@ examples_Examples.list = [{ name : "scale-rotate", script : function(state) {
 	return "convert " + state2.inputFiles[0].name + " -scale 50% -virtual-pixel mirror ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) ( +clone -distort SRT 22.5 ) output.gif";
 }},{ name : "gif-wave-swirl-gif", script : function(state3) {
 	return "convert -swirl 123 -wave 14x95 -scale 74% -rotate 15 -background transparent " + state3.inputFiles[0].name + " foo22.gif";
-}, description : "perform a series of complex effects over an animated gif which results in another animated transformed gif."}];
+}, description : "perform a series of complex effects over an animated gif which results in another animated transformed gif."},{ name : "build-animation", script : function(state4) {
+	return "\nconvert -size 101x101 radial-gradient: \\\n( -clone 0 -level 00,100% +level-colors ,#F00 ) \\\n( -clone 0 -level 10,100% +level-colors ,#F12 ) \\\n( -clone 0 -level 20,100% +level-colors ,#F24 ) \\\n( -clone 0 -level 30,100% +level-colors ,#F36 ) \\\n( -clone 0 -level 40,100% +level-colors ,#F46 ) \\\n-delete 0  -duplicate 1,-2-1 -set delay 1x30 -loop 0 out_pulsing_anim.gif";
+}, description : "Generates a radial-gradient image, which is then cloned and adjusted to create a red to brighter red-orange pulse. This is then duplicated to create a reversed Patrol Cycle before creating a 30 second, looped"}];
 examples_SampleImages.list = ["bluebells.png","bridge.psd","challenge.gif","photo.tiff","whale4.jpg","wand.ico"];
 haxe_crypto_Base64.CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 haxe_crypto_Base64.BYTES = haxe_io_Bytes.ofString(haxe_crypto_Base64.CHARS);

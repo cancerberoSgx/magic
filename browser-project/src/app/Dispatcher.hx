@@ -12,13 +12,17 @@ class Dispatcher {
 	public static function executeExample(?ex:Example) {
 		var state = Store.getInstance().getState();
 		ex = ex == null ? state.example : ex;
-		var script = ex.script(state);
+		execute(ex.script(state));
+	}
+
+	public static function execute(script:String) {
+		var state = Store.getInstance().getState();
 		Magic.run({
 			command: script,
 			files: state.inputFiles
 		}).then(result -> {
 			Store.getInstance().setState({
-				example: ex,
+				example: state.example,
 				outputFiles: result.files,
 				stdout: result.stdout.join('\n'),
 				stderr: result.stderr.join('\n'),
@@ -54,7 +58,7 @@ class Dispatcher {
 		Dispatcher.executeExample();
 	}
 
-  public static 	function executeExampleNamed(?name:String) {
+	public static function executeExampleNamed(?name:String) {
 		name = name == null ? Store.getInstance().getState().example.name : name;
 		var ex:Example = Examples.list.find(e -> e.name == name);
 		executeExample(ex);

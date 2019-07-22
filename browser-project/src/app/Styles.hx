@@ -12,7 +12,7 @@ img {
   cursor: pointer;
 }
 textarea {
-  height: 122px;
+  height: 100px;
   width: 100%;
 }
 table {
@@ -24,5 +24,15 @@ table {
 .inline {
   display: inline;
 }
+.inline-block {
+  display: inline-block;
+}
+h3 {
+  font-size: 1.1em;
+}
+h1 {
+  font-size: 1.3em;
+}
+table{margin: 0.5em; padding: 0;}
   ';
 }

@@ -1,10 +1,10 @@
 package app;
 
+import js.html.TextAreaElement;
 import magic.File;
 import examples.Example.Examples;
 import examples.SampleImages;
 import app.*;
-
 
 class Layout extends Component<Component.Props> {
 	override public function render() {
@@ -15,22 +15,22 @@ class Layout extends Component<Component.Props> {
 
 <p>Load images from your system or urls. <strong>A lot of formats are supported!</strong> like png, jpg, gif, tiff, bmp, tga, psd, ps, pdf, svg, heic, dpx, etc. Click on output images to download them. Edit the commands and run them again. Check for logs and errors. Checkout the example list to search for something similar you want to accomplish.</p>
 
-<br />
+<br/>
 
 <h3 class="inline">Examples</h3>
-<select class="examples">
-  ${Examples.list.map(e->
-  '<option ${this.props.state.example.name == e.name ? 'selected' : ''} value="${e.name}">${e.name}</option>'
-  ).join(' ')}
-</select>
-Description: ${this.props.state.example.description}
-
-<br />
+  <select class="examples">
+    ${Examples.list.map(e->
+    '<option ${this.props.state.example.name == e.name ? 'selected' : ''} value="${e.name}">${e.name}</option>'
+    ).join(' ')}
+  </select>
+  Description: <em>${this.props.state.example.description}</em>
+<br/>
 
 
 <h3 class="inline">Load Images</h3>
 <label>From file: 
-  <input type="file"  class="loadFile"/></label>
+  <input type="file"  class="loadFile"/>
+</label>
 <label>Sample Image: 
   <select class="sample-images">
   ${SampleImages.list.map(e->
@@ -38,39 +38,43 @@ Description: ${this.props.state.example.description}
   ).join(' ')}
   </select>
 </label>
-<br />
-
+<br/>
 
 <h3>Commands</h3>
 
 <textarea class="command">${this.props.state.script}</textarea>
-<br />
 
 <button class="execute">Execute</button>
-<br />
-
-<h3>Input files</h3>
-
-${this.props.state.inputFiles.map(function(f){
-  return '
-<div class="image">
-<img data-name="${f.name}" class="input" src="${f.asDataUrl('image/png')}"/> 
-<br/>
-<span><a href="#" class="input"> ${f.name}</a> (${Math.round(f.content.length / 1000)} KB)</span>
-</div>';}).join(" ")}
-
-<h3>Output files</h3>
-${this.props.state.outputFiles.map(function(f){return '
-<div class="image">
-<img data-name="${f.name}"  class="output" src="${f.asDataUrl("image/png")}" />
-<br/>
-<span><a href="#" class="input"> ${f.name}</a> (${Math.round(f.content.length / 1000)} KB)</span>
-</div>';}).join(" ")}
-<br/>
 
 <table>
   <tr>
-    <td><h3>stdout</h3></td><td><h3>stderr</h3></td>
+    <td><h3>Input Images</h3></td>
+    <td><h3>Output Images</h3></td>
+  </tr>
+  <tr>
+    <td>
+      ${this.props.state.inputFiles.map(f->'
+      <div class="inline-block">
+        <a href="#" class="input">${f.name} (${Math.round(f.content.length / 1000)} KB)</a>
+        <br/>
+        <img data-name="${f.name}" class="input" src="${f.asDataUrl('image/png')}"/> 
+      </div>').join(" ")}
+    </td>
+    <td>    
+    ${this.props.state.outputFiles.map(f-> '
+      <div class="inline-block">
+        <a href="#" class="input"> ${f.name} (${Math.round(f.content.length / 1000)} KB)</a>
+        <br/>
+        <img data-name="${f.name}" class="output" src="${f.asDataUrl("image/png")}" />
+      </div>').join(" ")}
+    </td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td><h3>stdout</h3></td>
+    <td><h3>stderr</h3></td>
   </tr>
   <tr>
     <td><textarea class="stdout">${this.props.state.stdout}</textarea></td>
@@ -88,11 +92,9 @@ ${Styles.css}
 	}
 
 	override function afterRender() {
-		queryOne('.execute').addEventListener('click', Dispatcher.executeExampleNamed);
+		queryOne('.execute').addEventListener('click', e -> Dispatcher.execute(cast(queryOne('.command'), TextAreaElement).value));
 
 		queryOne('.sample-images').addEventListener('change', e -> File.fromUrl(e.currentTarget.value).then(file -> Dispatcher.setInputFiles([file])));
-
-		queryOne('.examples').addEventListener('change', e -> Dispatcher.executeExampleNamed(e.currentTarget.value));
 
 		queryOne('.examples').addEventListener('change', e -> Dispatcher.executeExampleNamed(e.currentTarget.value));
 
